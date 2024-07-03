@@ -1,1 +1,1 @@
-/* executable to process NY data */
+/* Executable to process NY data */

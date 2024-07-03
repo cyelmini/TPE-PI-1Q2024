@@ -1,1 +1,1 @@
-/* executable to process CHI data */
+/* Executable to process CHI data */

@@ -29,3 +29,4 @@ struct parkingTicketsCDT{
     TList firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order.
 };
 
+
