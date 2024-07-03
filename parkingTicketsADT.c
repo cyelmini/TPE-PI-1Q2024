@@ -2,7 +2,7 @@
 
 #include "parkingTicketsADT.h"
 
-/*
+/* OPCION 1 (a definir) */
 typedef struct plate{
     char plate[MAX_PLATE];
     size_t count;
@@ -30,8 +30,8 @@ struct parkingTicketsCDT{
     TList firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order.
 };
 
-*/
 
+/* OPCION 2
 typedef struct infraction{
     char description[MAX_DESC];
     size_t count; // Total amount of times the infraction was committed
@@ -68,3 +68,4 @@ struct parkingTicketsCDT{
     TListAgency firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order (to be used in query2)
     TListInf firstInfraction; // Pointer to the first element of the list of infractions (to be used in query3)
 };
+*/
