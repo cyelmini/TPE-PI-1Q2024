@@ -24,7 +24,8 @@ int addInfraction(parkingTicketsADT p, const char *agency, const char *infractio
 void sortList(parkingTicketsADT p)
 
 
-enum {OK = 0, MEMERR, TOKERR};
+enum {OK = 0, ERROR_MEM, ERROR_TOK, ERROR_ARG, ERROR_OPEN};
+
 
 /*
  * MEMERR = Memory error
