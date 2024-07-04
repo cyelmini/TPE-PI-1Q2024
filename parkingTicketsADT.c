@@ -3,46 +3,12 @@
 #include "parkingTicketsADT.h"
 #include <errno.h>
 
-/* OPCION 2
-typedef struct infraction{
-    char description[MAX_DESC];
-    size_t count; // Total amount of times the infraction was committed
-}TInfraction;
+/*
+ * La idea es recibir la informacion de las infractions y cargarlas segun su id en el vector de las agencies.
+ * Despues de que esa funcion sea llamada, otras dos funciones se encargan de crear las listas ordenadas de las formas pedidas
+ * en las queries.
+ */
 
-typedef struct nodeAg{
-    char agency[MAX_AG];
-    TInfraction * infractions; // Vector containing the different infractions issued by the correspondent agency (each position in this vector corresponds with the infractionId)
-    size_t size; // Reserved space for the vector
-    size_t totalCount; // Total amount of infractions
-    size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector
-    struct node * tail;  // Pointer to the next agency
-} TNodeAgency;
-
-typedef nodeAg * TListAgency;
-
-typedef struct nodePlate{
-    char plate[MAX_PLATE];
-    size_t infractionCount; // Amount of times the plate commited the infraction
-    struct nodePlate * tail;
-} TNodePlate;
-
-typedef TNodePlate * TListPlate;
-
-typedef struct nodeInf{
-    char description[MAX_DESC];
-    TListPlate firstPlate; // Pointer to the first plate that commited the infraction
-    struct nodeInf * tail;
-} TNodeInf;
-
-typedef TNodeInf TListInf;
-
-struct parkingTicketsCDT{
-    TListAgency firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order (to be used in query2)
-    TListInf firstInfraction; // Pointer to the first element of the list of infractions (to be used in query3)
-};
-*/
-
-/* OPCION 1 (a definir) */
 typedef struct plate{
     char plate[MAX_PLATE];
     size_t count;
@@ -66,8 +32,18 @@ typedef struct nodeAg{
 
 typedef TNodeAg * TListAg;
 
+typedef struct nodeInf{ // List for all the infractions committed (regardless of the agency that issued them)
+    char description[MAX_DESC];
+    size_t count;
+    nodeInf * tail;
+} TNodeInf;
+
+typedef TNodeInf * TListInf;
+
 struct parkingTicketsCDT{
-    TListAg firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order.
+    TListAg firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order
+    TListInf firstCount; // Pointer to the first element of the list of infractions ordered by infraction count (to be used in query1)
+    TListInf firstAlpha; //  Pointer to the first element of the list of infractions ordered alphabetically (to be used int query2)
 };
 
 
