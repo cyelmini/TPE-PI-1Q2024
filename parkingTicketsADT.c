@@ -166,46 +166,57 @@ static TListInfCount sortByCountRec(TListInf list, char * infractionDesc, size_t
     return list;
 }
 
-static char * maxPlate(TListPlate list, size_t * count){
+static char * maxPlate(TListPlate list, size_t * count) {
     int maxCount = 0;
-    char * maxPlate;
+    char * maxPlate = NULL;
     TListPlate aux = list;
-    while(aux != NULL){
-        if(list->count > maxCount){
-            maxPlate = list->plate;
-            *count = list->count;
+    while (aux != NULL) {
+        if (aux->count > maxCount) {
+            maxPlate = aux->plate;
+            maxCount = aux->count;
         }
         aux = aux->tail;
+    }
+    if (count != NULL) {
+        *count = maxCount;
     }
     return maxPlate;
 }
 
-/* agregar tema plate */
-static TListInfAlpha sortAlphaRec(TListInf list, char *infractionDesc, size_t count, char *plate, TListPlate firstPlate){
+static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate) {
     int c;
-    if(list == NULL || strcmp(list->description, infractionDesc) > 0){
-        TListInfAlpha newInf = malloc(sizeof(TNodeInfAlpha);
+    if (list == NULL || (c = strcmp(list->description, infractionDesc)) > 0) {
+        TListInfAlpha newInf = malloc(sizeof(TNodeInfAlpha));
+        if (newInf == NULL) {
+            errno = ERROR_MEM;
+            return list;
+        }
         strcpy(newInf->description, infractionDesc);
-        newInf->plate = maxPlate(firstPlate, &(newInf->count));
+        strcpy(newInf->plate, plate);
+        newInf->count = count;
         newInf->tail = list;
         return newInf;
     }
-    if(c == 0){
+    if (c == 0) {
         return list;
     }
-    list->tail = sortByCountRec(list->tail, infractionDesc, count);
+    list->tail = sortAlphaRec(list->tail, infractionDesc, count, plate);
     return list;
 }
 
 /* Generates two lists of infractions that are sorted by
 * infraction count (to be used in query 1) and alphabetically (to be used in query 3)
 */
-void sortList(parkingTicketsADT p){
-    TListAg aux = p->firstAgency; //used to iterate over the list of agencies
-    while(aux != NULL){
-        for(int i = 0; i < aux->size; i++){
-            p->firstCount = sortByCountRec(parkingTicketsADT->firstCount, aux->infractions[i].description, aux->infractions[i].count);
-            p->firstAlpha = sortAlphaRec(parkingTicketsADT->firstAlpha, aux->infractions[i].description, aux->infractions[i].count, aux->infractions[i].firstPlate);
+void sortList(parkingTicketsADT p) {
+    TListAg aux = p->firstAgency;
+    while (aux != NULL) {
+        for (size_t i = 0; i < aux->size; i++) {
+            p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].count);
+            size_t maxCount = 0;
+            char * maxPlateStr = maxPlate(aux->infractions[i].firstPlate, &maxCount);
+            if (maxPlateStr != NULL) {
+                p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, maxCount, maxPlateStr);
+            }
         }
         aux = aux->tail;
     }
