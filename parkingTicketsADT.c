@@ -17,6 +17,7 @@ typedef struct infraction{
     size_t count; // Total amount of times the infraction was committed
 }TInfraction;
 
+// To be used in query1
 typedef struct nodeAg{
     char agency[MAX_AG];
     TInfraction * infractions; // Vector containing the different infractions issued by the correspondent agency (each position in this vector corresponds with the infractionId)
@@ -28,18 +29,29 @@ typedef struct nodeAg{
 
 typedef TNodeAg * TListAg;
 
-typedef struct nodeInf{ // List for all the infractions committed (regardless of the agency that issued them)
+//To be used in query2
+typedef struct nodeInfCount{
     char description[MAX_DESC];
-    size_t count;
-    nodeInf * tail;
-} TNodeInf;
+    size_t count;  // Total amount of infractions committed
+    nodeInfCount * tail;
+} TNodeInfCount;
 
-typedef TNodeInf * TListInf;
+typedef TNodeInfCount * TListInfCount;
+
+// To be used in query3
+typedef struct nodeInfAlpha{
+    char description[MAX_DESC];
+    char plate[MAX_PLATE]; //Plate that committed the infraction the most
+    size_t count; //Amount of times it committed it
+    nodeInfAlpha * tail;
+}TNodeInfAlpha;
+
+typedef TNodeInfAlpha * TListInfAlpha;
 
 struct parkingTicketsCDT{
     TListAg firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order
-    TListInf firstCount; // Pointer to the first element of the list of infractions ordered by infraction count (to be used in query1)
-    TListInf firstAlpha; //  Pointer to the first element of the list of infractions ordered alphabetically (to be used int query3)
+    TListInfCount firstCount; // Pointer to the first element of the list of infractions ordered by infraction count
+    TListInfAlpha firstAlpha; //  Pointer to the first element of the list of infractions ordered alphabetically
 };
 
 /* ACORDATE DE PONER LOS COMENTARIOS DE LAS FUNCIONES EN EL .H
@@ -138,7 +150,7 @@ int addInfraction(parkingTicketsADT p, const char *agency, const char *infractio
     return flag;
 }
 
-static TListInf sortByCountRec(TListInf list, char * infractionDesc, size_t count){
+static TListInfCount sortByCountRec(TListInf list, char * infractionDesc, size_t count){
     int c;
     if(list == NULL || (list->count > count)){
         TListInf newInf = malloc(sizeof(TNodeInf));
@@ -154,12 +166,27 @@ static TListInf sortByCountRec(TListInf list, char * infractionDesc, size_t coun
     return list;
 }
 
-static TListInf sortAlphaRec(TListInf list, char *infractionDesc, size_t count){
+static char * maxPlate(TListPlate list, size_t * count){
+    int maxCount = 0;
+    char * maxPlate;
+    TListPlate aux = list;
+    while(aux != NULL){
+        if(list->count > maxCount){
+            maxPlate = list->plate;
+            *count = list->count;
+        }
+        aux = aux->tail;
+    }
+    return maxPlate;
+}
+
+/* agregar tema plate */
+static TListInfAlpha sortAlphaRec(TListInf list, char *infractionDesc, size_t count, char *plate, TListPlate firstPlate){
     int c;
     if(list == NULL || strcmp(list->description, infractionDesc) > 0){
-        TListInf newInf = malloc(sizeof(TNodeInf);
+        TListInfAlpha newInf = malloc(sizeof(TNodeInfAlpha);
         strcpy(newInf->description, infractionDesc);
-        newInf->count = count;
+        newInf->plate = maxPlate(firstPlate, &(newInf->count));
         newInf->tail = list;
         return newInf;
     }
@@ -176,9 +203,9 @@ static TListInf sortAlphaRec(TListInf list, char *infractionDesc, size_t count){
 void sortList(parkingTicketsADT p){
     TListAg aux = p->firstAgency; //used to iterate over the list of agencies
     while(aux != NULL){
-        for(int i = 0; i < aux->totalCount; i++){
-            parkingTicketsADT->firstCount = sortbyCountRec(parkingTicketsADT->firstCount, aux->infractions[i].description, aux->infractions[i].count);
-            parkingTicketsADT->firstAlpha = sortAlphaRec(parkingTicketsADT->firstAlpha, aux->infractions[i].description, aux->infractions[i].count);
+        for(int i = 0; i < aux->size; i++){
+            p->firstCount = sortByCountRec(parkingTicketsADT->firstCount, aux->infractions[i].description, aux->infractions[i].count);
+            p->firstAlpha = sortAlphaRec(parkingTicketsADT->firstAlpha, aux->infractions[i].description, aux->infractions[i].count, aux->infractions[i].firstPlate);
         }
         aux = aux->tail;
     }
