@@ -8,7 +8,7 @@
 #define MAX_PLATE 10
 #define MAX_DESC 50
 #define MAX_AG 35
-
+#define BLOCK 100
 
 typedef struct parkingTicketsCDT * parkingTicketsADT;
 
