@@ -18,7 +18,10 @@ typedef struct parkingTicketsCDT * parkingTicketsADT;
  */
 int addInfraction(parkingTicketsADT p, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate);
 
-
+/* Generates two lists of infractions that are sorted by
+* infraction count (to be used in query 1) and alphabetically (to be used in query 3)
+*/
+void sortList(parkingTicketsADT p)
 
 
 enum {OK = 0, MEMERR, TOKERR};

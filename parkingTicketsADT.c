@@ -22,7 +22,7 @@ typedef struct nodeAg{
     TInfraction * infractions; // Vector containing the different infractions issued by the correspondent agency (each position in this vector corresponds with the infractionId)
     size_t size; // Reserved space for the infractions vector
     size_t totalCount; // Total amount of infractions
-    size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector
+    size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector (to be used in query2)
     struct nodeAg * tail;  // Pointer to the next agency
 } TNodeAg;
 
@@ -138,29 +138,48 @@ int addInfraction(parkingTicketsADT p, const char *agency, const char *infractio
     return flag;
 }
 
-
-static TListInf sortByCountRec(TListInf list){
-    
+static TListInf sortByCountRec(TListInf list, char * infractionDesc, size_t count){
+    int c;
+    if(list == NULL || (list->count > count)){
+        TListInf newInf = malloc(sizeof(TNodeInf));
+        strcpy(newInf->description, infractionDesc);
+        newInf->count = count;
+        newInf->tail = list;
+        return newInf;
+    }
+    if(c == 0){
+        return list;
+    }
+    list->tail = sortByCountRec(list->tail, infractionDesc, count);
+    return list;
 }
 
-/* Generates a list of infractions that is sorted by
-* infraction count (to be used in query 1)
+static TListInf sortAlphaRec(TListInf list, char *infractionDesc, size_t count){
+    int c;
+    if(list == NULL || strcmp(list->description, infractionDesc) > 0){
+        TListInf newInf = malloc(sizeof(TNodeInf);
+        strcpy(newInf->description, infractionDesc);
+        newInf->count = count;
+        newInf->tail = list;
+        return newInf;
+    }
+    if(c == 0){
+        return list;
+    }
+    list->tail = sortByCountRec(list->tail, infractionDesc, count);
+    return list;
+}
+
+/* Generates two lists of infractions that are sorted by
+* infraction count (to be used in query 1) and alphabetically (to be used in query 3)
 */
-TListInf sortByCount(parkingTicketsADT p){
+void sortList(parkingTicketsADT p){
     TListAg aux = p->firstAgency; //used to iterate over the list of agencies
     while(aux != NULL){
-        /* enter code here */
+        for(int i = 0; i < aux->totalCount; i++){
+            parkingTicketsADT->firstCount = sortbyCountRec(parkingTicketsADT->firstCount, aux->infractions[i].description, aux->infractions[i].count);
+            parkingTicketsADT->firstAlpha = sortAlphaRec(parkingTicketsADT->firstAlpha, aux->infractions[i].description, aux->infractions[i].count);
+        }
         aux = aux->tail;
     }
-}
-
-static TListInf sortAlphaRec(TListInf list){
-
-}
-
-/* Generates a list of infractions that is sorted alphabetically
-* (to be used in query 3)
-*/
-TListInf sortAlpha(parkingTicketsADT p){
-
 }
