@@ -40,7 +40,6 @@ struct parkingTicketsCDT{
     TListAg firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order
     TListInf firstCount; // Pointer to the first element of the list of infractions ordered by infraction count (to be used in query1)
     TListInf firstAlpha; //  Pointer to the first element of the list of infractions ordered alphabetically (to be used int query3)
-    TListInf iter; //To iterate over the lists
 };
 
 /* ACORDATE DE PONER LOS COMENTARIOS DE LAS FUNCIONES EN EL .H
@@ -109,7 +108,7 @@ static void addInfractionAux(TListAg list, const char *infractionDesc, size_t in
 
 static TListAg addInfractionRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag) {
     int c;
-    if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not yet exist
+    if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not exist
         TListAg newAg = calloc(1, sizeof(TNodeAg));
         if (newAg == NULL) {
             errno = MEMERR;
@@ -137,4 +136,31 @@ int addInfraction(parkingTicketsADT p, const char *agency, const char *infractio
     int flag = 0;
     p->firstAgency = addInfractionRec(p->firstAgency, agency, infractionDesc, infractionId, plate, &flag);
     return flag;
+}
+
+
+static TListInf sortByCountRec(TListInf list){
+    
+}
+
+/* Generates a list of infractions that is sorted by
+* infraction count (to be used in query 1)
+*/
+TListInf sortByCount(parkingTicketsADT p){
+    TListAg aux = p->firstAgency; //used to iterate over the list of agencies
+    while(aux != NULL){
+        /* enter code here */
+        aux = aux->tail;
+    }
+}
+
+static TListInf sortAlphaRec(TListInf list){
+
+}
+
+/* Generates a list of infractions that is sorted alphabetically
+* (to be used in query 3)
+*/
+TListInf sortAlpha(parkingTicketsADT p){
+
 }
