@@ -12,6 +12,11 @@
 
 typedef struct parkingTicketsCDT * parkingTicketsADT;
 
+/* Adds an infraction committed by a given plate to the correspondent agency that emitted it.
+ * If the agency did not exist, it adds it to the list as well. Returns 1 if successfully done
+ * and 0 if not.
+ */
+int addInfraction(parkingTicketsADT p, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate);
 
 
 
