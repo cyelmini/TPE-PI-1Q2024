@@ -55,20 +55,21 @@ typedef struct infraction{
     size_t count; // Total amount of times the infraction was committed
 }TInfraction;
 
-typedef struct node{
+typedef struct nodeAg{
     char agency[MAX_AG];
     TInfraction * infractions; // Vector containing the different infractions issued by the correspondent agency (each position in this vector corresponds with the infractionId)
     size_t size; // Reserved space for the vector
     size_t totalCount; // Total amount of infractions
     size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector
     struct node * tail;  // Pointer to the next agency
-} TNode;
+} TNodeAg;
 
-typedef TNode * TList;
+typedef TNodeAg * TListAg;
 
 struct parkingTicketsCDT{
-    TList firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order.
+    TListAg firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order.
 };
+
 
 parkingTicketsADT newParking(void){
     errno = OK;
@@ -80,7 +81,6 @@ parkingTicketsADT newParking(void){
     }
     return aux;
 }
-
 
 
 
