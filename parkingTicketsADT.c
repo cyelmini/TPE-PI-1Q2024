@@ -52,7 +52,7 @@ parkingTicketsADT newParking(void) {
     parkingTicketsADT aux = calloc(1, sizeof(struct parkingTicketsCDT));
 
     if (aux == NULL) {
-        errno = MEMERR;
+        errno = ERROR_MEM;
         return NULL;
     }
     return aux;
@@ -63,7 +63,7 @@ static TListPlate addPlateRec(TListPlate list, const char *plate) {
     if (list == NULL || (c = strcmp(list->plate, plate)) > 0) { // Plate has not yet been added
         TListPlate newPlate = malloc(sizeof(TNodePlate));
         if (newPlate == NULL) {
-            errno = MEMERR;
+            errno = ERROR_MEM;
             return list;
         }
         strcpy(newPlate->plate, plate);
@@ -84,7 +84,7 @@ static void addInfractionAux(TListAg list, const char *infractionDesc, size_t in
     if (newSize > list->size) {
         TInfraction * temp = realloc(list->infractions, newSize * sizeof(TInfraction));
         if (temp == NULL) {
-            errno = MEMERR;
+            errno = ERROR_MEM;
             return;
         }
         list->infractions = temp;
@@ -112,7 +112,7 @@ static TListAg addInfractionRec(TListAg list, const char *agency, const char *in
     if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not yet exist
         TListAg newAg = calloc(1, sizeof(TNodeAg));
         if (newAg == NULL) {
-            errno = MEMERR;
+            errno = ERROR_MEM;
             return list;
         }
         strcpy(newAg->agency, agency);
