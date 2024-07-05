@@ -44,7 +44,6 @@ typedef struct nodeInfAlpha{
     size_t plateCount; //Amount of times it committed it
     nodeInfAlpha * tail;
 }TNodeInfAlpha;
-
 typedef TNodeInfAlpha * TListInfAlpha;
 
 struct parkingTicketsCDT{
@@ -72,7 +71,6 @@ parkingTicketsADT newParking(void) {
 }
 
 void addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
-    errno = OK;
 
     //validar datos////////////////////////////////////////////
 
