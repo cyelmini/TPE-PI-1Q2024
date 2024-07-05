@@ -81,7 +81,7 @@ void addInfraction(parkingTickesADT p, size_t infractionId, const char* descript
             return;
         } else {
             p->idReference = temp;
-            for(int i=(p->dimIdReference+1),i<=infractionId,i++){
+            for(int i=(p->dimIdReference+1);i<=infractionId;i++){
                 p->idReference[i]=NULL;
             }
             p->dimIdReference = infractionId;
@@ -366,10 +366,20 @@ static void freeListAgRec(TListAg list){
     freeListAgRec(list);
 }
 
+void freeVecReference(parkingTicketsCDT p){
+    for(int i=0;i<=p->dimIdReference;i++){
+        if(p->IdReference[i]!=NULL){
+            free(p->IdReference[i]);
+        }
+    }
+    free(p->idReference);
+    return;
+}
+
 void freeParkingTickets(parkingTicketsADT p){
     freeListAgRec(p->firstAgency);
     freeListCountRec(p->firstCount);
     freeListAlphaRec(p->firstAlpha);
-    free(p->idReference);   //maaaaaaaal
+    freeVecReference(p->idReference);
     free(p);
 }
