@@ -54,7 +54,7 @@ void query3(parkingTicketsADT p);
 int main(int argc, char * argv[]){
 
     if (argc != 2){
-        fprintf(sterr, "Invalid amount of arguments\n");
+        fprintf(stderr, "Invalid amount of arguments\n");
         exit(ERROR_ARG);
     }
     
@@ -151,7 +151,7 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
                 exit(ERROR_TOKEN);
             }
             strncpy(issuingAgency, temp, sizeof(issuingAgency) - 1);
-            issuingAgency[strlen(issuingAgency) - 1] = '\0';
+            issuingAgency[sizeof(issuingAgency) - 1] = '\0';
 
             //Falta la funcion que agrega la info del ticket al TAD
             
