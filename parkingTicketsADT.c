@@ -162,7 +162,7 @@ int addInfraction(parkingTicketsADT p, const char *agency, const char *infractio
     return flag;
 }
 
-static TListInfCount sortByCountRec(TListInfCount list, char * infractionDesc, size_t count){
+static TListInfCount sortByCountRec(TListInfCount list, const char * infractionDesc, size_t count){
     int c;
     if(list == NULL || (list->count > count)){
         TListInfCount newInfCount = malloc(sizeof(TNodeInfCount));
@@ -207,7 +207,7 @@ void sortList(parkingTicketsADT p) {
     TListAg aux = p->firstAgency;
     while (aux != NULL) {
         for (size_t i = 0; i < aux->size; i++) {
-            p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].count);
+            p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].totalCount);
             p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate);
         }
         aux = aux->tail;
