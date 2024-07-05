@@ -54,7 +54,7 @@ struct parkingTicketsCDT{
     TListInfCount iterCount;
     TListInfAlpha firstAlpha; //Pointer to the first element of the list of infractions ordered alphabetically
     TListInfAlpha iterAlpha;
-    char** idReference;   //Vector where the position is the infractionId
+    char** idReference;   //Vector where the position corresponds with the infractionId
     size_t dimIdReference; //Dimension of the vector
 };
 
@@ -118,7 +118,7 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
             return;
         }
         list->infractions = temp;
-        for (size_t i = list->size; i < newSize; i++) {  //initialize the new reserved spaces on the vector
+        for (size_t i = list->size; i < newSize; i++) {  //Initialize the new reserved spaces on the vector
             list->infractions[i].description = NULL;
             list->infractions[i].firstPlate = NULL;
             list->infractions[i].plate = NULL;
@@ -127,21 +127,21 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
         }
         list->size = newSize;
     }
-    if(list->infractions[infractionId].totalCount == 0) { //copy the new infraction if it is the first time it was committed
+    if(list->infractions[infractionId].totalCount == 0) { //Copy the new infraction if it is the first time it was committed
         strcpy(list->infractions[infractionId].description, infractionDesc);
     }
 
-    list->infractions[infractionId].totalCount++; //register a new apparition
+    list->infractions[infractionId].totalCount++; //Register a new apparition
 
-    //if it was not the first time then we only have to add the plate that did it
+    //If it was not the first time then we only have to add the plate that did it
     size_t newCount;
     list->infractions[infractionId].firstPlate = addPlateRec(list->infractions[infractionId].firstPlate, plate, &newCount);
-    if(newCount > list->infractions[infractionId].maxPlateCount){ //update the plate that committed the infraction the most
+    if(newCount > list->infractions[infractionId].maxPlateCount){ //Update the plate that committed the infraction the most
         list->infractions[infractionId].maxPlateCount = newCount;
         strcpy(list->infractions[infractionId].plate, plate);
     }
 
-    if(list->infractions[infractionId].totalCount > list->infractions[list->maxPosInfraction].totalCount) { //update the most popular infraction by agency
+    if(list->infractions[infractionId].totalCount > list->infractions[list->maxPosInfraction].totalCount) { //Update the most popular infraction by agency
         list->maxPosInfraction = infractionId;
     }
 }
@@ -356,7 +356,6 @@ void freeParkingTickets(parkingTicketsADT p){
     freeListAgRec(p->firstAgency);
     freeListCountRec(p->firstCount);
     freeListAlphaRec(p->firstAlpha);
-    free(p->IdReference);
-    free(p->dimIdReference);
+    free(p->idReference);
     free(p);
 }
