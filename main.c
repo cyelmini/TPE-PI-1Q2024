@@ -96,7 +96,7 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
         while(fgets(line, MAX_CHARS, fileTickets)!= NULL){
             temp = strtok(NULL, DELIM);
             if(temp == NULL){
-                printf(stderr, "Error in Tok");
+                fprintf(stderr, "Token error\n");
                 exit(ERROR_TOKEN);
             }
             strncpy(plate, temp, sizeof(plate) - 1);
@@ -165,11 +165,11 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
 
 /*---------------------------------------------- QUERIES -----------------------------------------------------------*/
 
-/* TOTAL DE MULTAS POR INFRACCION
- * Donde cada línea de la salida contenga, separados por “;” el nombre de la infracción y
- * la cantidad total de multas con esa infracción. La información debe listarse ordenada
- * en forma descendente por la cantidad total de multas y a igualdad de multas desempatar
- * alfabéticamente por nombre de la infracción.
+/* TOTAL FINES PER INFRACTION
+ * Each line of the output should contain, separated by “;”, the name of the infraction and
+ * the total number of fines for that infraction. The information should be listed in
+ * descending order by the total number of fines, and if there is a tie, sort alphabetically
+ * by the name of the violation.
  */
 void query1(parkingTicketsADT p){
     FILE * query1 = fopen("query1.csv", "wt");
@@ -188,13 +188,13 @@ void query1(parkingTicketsADT p){
     fclose(query1);
 }
 
-/* INFRACCION MAS POPULAR POR AGENCIA EMISORA
- * Donde cada línea de la salida contenga, separados por “;” el nombre de la agencia emisora,
- * la infracción más popular de esa agencia emisora y la cantidad de multas correspondiente.
- * La infracción más popular de una agencia emisora es la que tiene la mayor cantidad de multas.
- * En caso de que existan dos o más infracciones con la misma cantidad de multas para la misma
- * agencia emisora considerar la menor infracción en orden alfabético.
- * La información debe listarse ordenada en forma alfabética por agencia emisora.
+/* MOST POPULAR INFRACTION BY ISSUING AGENCY
+ * Each line of the output should contain, separated by “;”, the name of the issuing agency,
+ * the most popular infraction from that issuing agency, and the corresponding number of fines.
+ * The most popular infraction of an issuing agency is the one with the highest number of fines.
+ * In case there are two or more infractions with the same number of fines for the same
+ * issuing agency, consider the infraction with the lowest alphabetical order.
+ * The information should be listed in alphabetical order by issuing agency.
  */
 void query2(parkingTicketsADT p){
     FILE * query2 = fopen("query2.csv", "wt");
@@ -214,12 +214,12 @@ void query2(parkingTicketsADT p){
     fclose(query2);
 }
 
-/* PATENTE CON MAS MULTAS POR INFRACCION
- *  Donde cada línea de la salida contenga, separados por “;” el nombre de la infracción,
- *  la patente con la mayor cantidad de multas de esa infracción y la cantidad de multas.
- *  En caso de que existan dos o más patentes con la misma cantidad de multas para la misma
- *  infracción considerar la menor patente en orden alfabético. La información debe listarse
- *  ordenada en forma alfabética por infracción.
+/* LICENSE PLATE WITH MOST FINES PER INFRACTION
+ * Each line of the output should contain, separated by “;”, the name of the infraction,
+ * the license plate with the highest number of fines for that infraction, and the number of fines.
+ * In case there are two or more license plates with the same number of fines for the same
+ * infraction, consider the license plate with the lowest alphabetical order. The information should be listed
+ * in alphabetical order by infraction.
  */
 void query3(parkingTicketsADT p){
     FILE * query3 = fopen("query3.csv", "wt");
