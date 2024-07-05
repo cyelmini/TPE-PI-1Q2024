@@ -7,6 +7,7 @@
 #define DELIM ";"
 #define IS_NYC 1
 #define IS_CHI 0
+#define END_OF_LINE "/n"
 
 /* Reads the .csv file for tickets and extracts the plate, infractionId,
 * fineAmount and the issuingAgency and returns a new ADT with the processed data
@@ -36,42 +37,43 @@ int main(int argc, char * argv[]){
         exit(ERROR_OPEN);
     }
 
-    parkingTicketsADT infraction = newParking();
-}
-
-int readTicketCity(char * line){
-    char * temp = strtok(line, DELIM);
-    //return temp == "plate" ? IS_NYC : IS_CHI;  COMO VAS A COMPARAR DOS STRINGS CON UN == ?????!!!
-    return (strcmp(temp, "plate") == 0) ? IS_NYC : IS_CHI;
-
+    
+    while()
 }
 
 parkingTicketsADT readTickets(FILE * fileTickets, parkingTicketsADT infraction){
     char line[MAX_CHARS];
-    int flag;
     char * temp;
 
-    //Reads the header of the file and decides whether it is NYC or CHI
     fscanf(fileTickets, "%s\n", line); 
-    flag = isCity(line);
-
-    char * plate;
-    size_t infractionId;
-    char * issuingAgency;
-    if(flag == IS_NYC){
-       while(fgets(line, MAX_CHARS, fileTickets) != NULL){
-        temp = strtok(line, DELIM);
-        if(temp == NULL){
-            fprintf(stderr, "Error in Tok");
-            exit(ERROR_TOKEN);
-        }
-       }
+    
+    if(line == NULL){
+        return NULL;
     }
-    if(flag == IS_CHI){
-       //I skip the issueDate
+    
+    temp = strtok(line, DELIM);
+    //Based on the first parameter, it decides whether it is NYC or CHI
+    if(strcmp(temp, "plate") == 0){
+        char * plate;
+        size_t infractionId;
+        char * issuingAgency;
+         if(fgets(line, MAX_CHARS, fileTickets) != NULL){
+            temp = strtok(NULL, DELIM);
+            if(temp == NULL){
+                printf(stderr, "Error in Tok");
+                exit(ERROR_TOKEN);
+            }
+            plate = temp;
+            //Ignore this temp because the issueDate is not needed for the queries
+            temp = strtok(NULL, DELIM);
+            temp = strtok(NULL, DELIM);
+            infractionId = atoi(temp);
+            //Ignore this temp because the fineAmount is not needed for the queries
+            temp = strtok(NULL, END_OF_LINE);
+            issuingAgency = temp;
+        }
     }
 }
-
 /*---------------------------------------------- QUERIES -----------------------------------------------------------*/
 
 /* TOTAL DE MULTAS POR INFRACCION
