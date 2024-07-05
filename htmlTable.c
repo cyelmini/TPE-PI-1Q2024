@@ -11,7 +11,6 @@
 struct table {
 	FILE * file;
 	unsigned int columns;
-	
 };
 
 static void addNodes(const char * fatherNode, const char * childNode, htmlTable table, va_list arg);

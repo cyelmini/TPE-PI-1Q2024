@@ -25,7 +25,7 @@ typedef struct nodeAg{
     TInfraction * infractions; // Vector containing the different infractions issued by the correspondent agency (each position in this vector corresponds with the infractionId)
     size_t size; // Reserved space for the infractions vector
     size_t totalCount; // Total amount of infractions
-    size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector (to be used in query2)
+    size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector
     struct nodeAg * tail;  // Pointer to the next agency
 } TNodeAg;
 
@@ -102,7 +102,7 @@ static void addInfractionAux(TListAg list, const char *infractionDesc, size_t in
             return;
         }
         list->infractions = temp;
-        for (size_t i = list->size; i < newSize; i++) {
+        for (size_t i = list->size; i < newSize; i++) {  //initialize the new reserved spaces on the vector
             list->infractions[i].description = NULL;
             list->infractions[i].firstPlate = NULL;
             list->infractions[i].plate = NULL;
@@ -111,23 +111,23 @@ static void addInfractionAux(TListAg list, const char *infractionDesc, size_t in
         }
         list->size = newSize;
     }
-    if (list->infractions[infractionId].count == 0) {
+    if(list->infractions[infractionId].totalCount == 0) { //copy the new infraction if it is the first time it was committed
         strcpy(list->infractions[infractionId].description, infractionDesc);
     }
 
+    list->infractions[infractionId].totalCount++; //register a new apparition
+
+    //if it was not the first time then we only have to add the plate that did it
     size_t newCount;
     list->infractions[infractionId].firstPlate = addPlateRec(list->infractions[infractionId].firstPlate, plate, &newCount);
-    list->infractions[infractionId].totalCount++;
-
-    if(newCount > list->infractions[infractionId].maxPlateCount){
+    if(newCount > list->infractions[infractionId].maxPlateCount){ //update the plate that committed the infraction the most
         list->infractions[infractionId].maxPlateCount = newCount;
         strcpy(list->infractions[infractionId].plate, plate);
     }
 
-    if(list->infractions[infractionId].count > list->infractions[list->maxPosInfraction].count) {
+    if(list->infractions[infractionId].totalCount > list->infractions[list->maxPosInfraction].totalCount) { //update the most popular infraction by agency
         list->maxPosInfraction = infractionId;
     }
-    list->totalCount++;
 }
 
 static TListAg addInfractionRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag) {
@@ -162,18 +162,18 @@ int addInfraction(parkingTicketsADT p, const char *agency, const char *infractio
     return flag;
 }
 
-static TListInfCount sortByCountRec(TListInf list, char * infractionDesc, size_t count){
+static TListInfCount sortByCountRec(TListInfCount list, char * infractionDesc, size_t count){
     int c;
     if(list == NULL || (list->count > count)){
-        TListInf newInf = malloc(sizeof(TNodeInf));
-        if (newInf == NULL) {
+        TListInfCount newInfCount = malloc(sizeof(TNodeInfCount));
+        if (newInfCount == NULL) {
             errno = ERROR_MEM;
             return list;
         }
-        strcpy(newInf->description, infractionDesc);
-        newInf->count = count;
-        newInf->tail = list;
-        return newInf;
+        strcpy(newInfCount->description, infractionDesc);
+        newInfCount->count = count;
+        newInfCount->tail = list;
+        return newInfCount;
     }
     if(c == 0){
         return list;
@@ -185,15 +185,15 @@ static TListInfCount sortByCountRec(TListInf list, char * infractionDesc, size_t
 static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate) {
     int c;
     if (list == NULL || (c = strcmp(list->description, infractionDesc)) > 0) {
-        TListInfAlpha newInf = malloc(sizeof(TNodeInfAlpha));
-        if (newInf == NULL) {
+        TListInfAlpha newInfAlpha = malloc(sizeof(TNodeInfAlpha));
+        if (newInfAlpha == NULL) {
             errno = ERROR_MEM;
             return list;
         }
-        strcpy(newInf->description, infractionDesc);
-        strcpy(newInf->plate, plate);
-        newInf->count = count;
-        newInf->tail = list;
+        strcpy(newInfAlpha->description, infractionDesc);
+        strcpy(newInfAlpha->plate, plate);
+        newInfAlpha->plateCount = count;
+        newInfAlpha->tail = list;
         return newInf;
     }
     if (c == 0) {
@@ -313,7 +313,7 @@ static freePlateRec(TListPlate list){
         return;
     }
     TListPlate aux = list;
-    list = list->plate;
+    list = list->tail;
     free(aux);
     freePlateRec(list);
 }

@@ -34,7 +34,7 @@ void toBeginAg(parkingTicketsADT p);
 int hasNextAg(parkingTicketsADT p);
 
 /* Returns the name of the agency that emitted the infraction, and by parameters the description
-* of the most popular infraction and the amount of times it was committed
+* of the most popular infraction and the amount of times it was committed.
 */
 char * nextAg(parkingTicketsADT p, char ** mostPopularInf, size_t infractionCount);
 
@@ -49,7 +49,7 @@ void toBeginCount(parkingTicketsADT p);
 int hasNextCount(parkingTicketsADT p);
 
 /* Returns the description of the most committed infraction and by parameter
-* the amount of times it was comitted
+* the amount of times it was committed.
 */
 char * nextCount(parkingTicketsADT p, size_t * count);
 
@@ -68,7 +68,7 @@ int hasNextAlpha(parkingTicketsADT p);
 */
 char * nextAlpha(parkingTicketsADT p, char ** maxPlate, size_t * infractionCount);
 
-/* Frees the memory reserved by the ADT; */
+/* Frees the memory reserved by the ADT */
 void freeParkingTickets(parkingTicketsADT p);
 
 enum {OK = 0, ERROR_MEM, ERROR_TOK, ERROR_ARG, ERROR_OPEN, NEXT_ERROR};
