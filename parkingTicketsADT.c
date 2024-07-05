@@ -69,16 +69,14 @@ parkingTicketsADT newParking(void) {
     aux->idReference=NULL;
     return aux;
 }
-//retorna (??????) si falla
-int addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
-    int ret=1;
-    //validar datos//////////////////////////////////////////// el tp en pag 4 dice q se asume q el forato y contenido es correcto asiq no deberia??
 
+int addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
+    int ret = 1;
     if(infractionId >= p->dimIdReference){
         char **temp = realloc(adt->idReference, (infractionId + 1) * sizeof(char *));
-        if(temp == NULL){//    FALLA
+        if(temp == NULL){
             errno = ERROR_MEM;
-            ret=-1;
+            ret = 0;
             return ret;
         } else {
             p->idReference = temp;
@@ -88,16 +86,16 @@ int addInfraction(parkingTickesADT p, size_t infractionId, const char* descripti
             p->dimIdReference = infractionId;
             strcpy(p->idReference[infractionId], description); 
         }    
-    } else  if(p->idReference[infractionId]==NULL){
-        char** temp2=malloc((MAX_DESC+1)*sizeof(char)); //( chequiar el tamano)
+    } else if(p->idReference[infractionId] == NULL){
+        char** temp2=malloc((MAX_DESC+1)*sizeof(char));
         if(temp2 == NULL){
             errno = ERROR_MEM;
             return ret;
         } else {
-            p->idReference[infractionId]=temp2;
+            p->idReference[infractionId] = temp2;  // Incompatible pointer types assigning to 'char *' from 'char **'; dereference with *
             strcpy(p->idReference[infractionId], description);
         }
-    }//else ya estaba agregado no hace nada
+    }
     return ret;
 }
 
@@ -185,7 +183,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
 
 int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate) {
     int flag = 0;
-    if(agency == NULL || || plate ==  NULL){  //(esos || || estan bien?)//////////////////////////////////////////////////
+    if(agency == NULL || plate ==  NULL){
         errno = ERROR_ARG;
         return flag;
     }
@@ -215,7 +213,7 @@ static TListInfCount sortByCountRec(TListInfCount list, const char * infractionD
 
 static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate) {
     int c;
-    if (list == NULL || (c = strcmp(list->description, infractionDesc)) > 0) {
+    if (list == NULL || (c = strcasecmp(list->description, infractionDesc)) > 0) {
         TListInfAlpha newInfAlpha = malloc(sizeof(TNodeInfAlpha));
         if (newInfAlpha == NULL) {
             errno = ERROR_MEM;
@@ -368,8 +366,8 @@ static void freeListAgRec(TListAg list){
 }
 
 void freeVecReference(parkingTicketsCDT p){
-    for(int i=0;i<=p->dimIdReference;i++){
-        if(p->IdReference[i]!=NULL){
+    for(int i = 0; i <= p->dimIdReference; i++){
+        if(p->IdReference[i] != NULL){
             free(p->IdReference[i]);
         }
     }

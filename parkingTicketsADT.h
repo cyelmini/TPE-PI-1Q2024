@@ -3,9 +3,12 @@
 
 #include <stdlib.h>
 
-#define MAX_PLATE 10
-#define MAX_DESC 50
-#define MAX_AG 35
+/* The values exceed the maximum values provided
+* by a little just in case
+*/
+#define MAX_PLATE 15
+#define MAX_DESC 55
+#define MAX_AG 40
 
 typedef struct parkingTicketsCDT * parkingTicketsADT;
 
@@ -16,8 +19,7 @@ parkingTicketsADT newParking(void);
 
 /* Generates a reference for the inputted infraction id and
 * the infraction description. Should be filled before inputting
-* the tickets.
-* will return ???
+* the tickets. Returns 1 if successfully done and 0 if not.
 */
 int addInfraction(parkingTicketsADT adt,size_t infractionId,const char* description);
 
