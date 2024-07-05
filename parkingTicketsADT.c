@@ -69,16 +69,17 @@ parkingTicketsADT newParking(void) {
     aux->idReference=NULL;
     return aux;
 }
-
-void addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
-
-    //validar datos////////////////////////////////////////////
+//retorna (??????) si falla
+int addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
+    int ret=1;
+    //validar datos//////////////////////////////////////////// el tp en pag 4 dice q se asume q el forato y contenido es correcto asiq no deberia??
 
     if(infractionId >= p->dimIdReference){
         char **temp = realloc(adt->idReference, (infractionId + 1) * sizeof(char *));
-        if(temp == NULL){
+        if(temp == NULL){//    FALLA
             errno = ERROR_MEM;
-            return;
+            ret=-1;
+            return ret;
         } else {
             p->idReference = temp;
             for(int i=(p->dimIdReference+1);i<=infractionId;i++){
@@ -88,16 +89,16 @@ void addInfraction(parkingTickesADT p, size_t infractionId, const char* descript
             strcpy(p->idReference[infractionId], description); 
         }    
     } else  if(p->idReference[infractionId]==NULL){
-        char** temp2=malloc(MAX_DESC*sizeof(char));
+        char** temp2=malloc((MAX_DESC+1)*sizeof(char)); //( chequiar el tamano)
         if(temp2 == NULL){
             errno = ERROR_MEM;
-            return;
+            return ret;
         } else {
             p->idReference[infractionId]=temp2;
             strcpy(p->idReference[infractionId], description);
         }
     }//else ya estaba agregado no hace nada
-    return;
+    return ret;
 }
 
 static TListPlate addPlateRec(TListPlate list, const char *plate, size_t * newCount) {
@@ -184,7 +185,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
 
 int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate) {
     int flag = 0;
-    if(agency == NULL || || plate ==  NULL){
+    if(agency == NULL || || plate ==  NULL){  //(esos || || estan bien?)//////////////////////////////////////////////////
         errno = ERROR_ARG;
         return flag;
     }
