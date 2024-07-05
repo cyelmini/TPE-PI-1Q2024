@@ -70,31 +70,34 @@ parkingTicketsADT newParking(void) {
     return aux;
 }
 
-int addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
+int addInfraction(parkingTicketsADT p, size_t infractionId, const char* description) {
     int ret = 1;
-    if(infractionId >= p->dimIdReference){
-        char **temp = realloc(adt->idReference, (infractionId + 1) * sizeof(char *));
-        if(temp == NULL){
+    if (infractionId >= p->dimIdReference) {
+        char **temp = realloc(p->idReference, (infractionId + 1) * sizeof(char *));
+        if (temp == NULL) {
             errno = ERROR_MEM;
             ret = 0;
             return ret;
         } else {
             p->idReference = temp;
-            for(int i=(p->dimIdReference+1);i<=infractionId;i++){
-                p->idReference[i]=NULL;
+            for (size_t i = p->dimIdReference; i <= infractionId; i++) {
+                p->idReference[i] = NULL;
             }
-            p->dimIdReference = infractionId;
-            strcpy(p->idReference[infractionId], description); 
-        }    
-    } else if(p->idReference[infractionId] == NULL){
-        char* temp2=malloc((MAX_DESC+1)*sizeof(char));
-        if(temp2 == NULL){
-            errno = ERROR_MEM;
-            return ret;
-        } else {                                   //                                   O/
-            p->idReference[infractionId] = temp2;  // Warnind (no deberia estar mas)   /|
-            strcpy(p->idReference[infractionId], description);                    //   / \
+            p->dimIdReference = infractionId + 1;
+            p->idReference[infractionId] = malloc((MAX_DESC + 1) * sizeof(char));
+            if (p->idReference[infractionId] == NULL) {
+                errno = ERROR_MEM;
+                return 0;
+            }
+            strcpy(p->idReference[infractionId], description);
         }
+    } else if (p->idReference[infractionId] == NULL) {
+        p->idReference[infractionId] = malloc((MAX_DESC + 1) * sizeof(char));
+        if (p->idReference[infractionId] == NULL) {
+            errno = ERROR_MEM;
+            return 0;
+        }
+        strcpy(p->idReference[infractionId], description);
     }
     return ret;
 }
@@ -365,20 +368,19 @@ static void freeListAgRec(TListAg list){
     freeListAgRec(list);
 }
 
-void freeVecReference(parkingTicketsCDT p){
-    for(int i = 0; i <= p->dimIdReference; i++){
-        if(p->IdReference[i] != NULL){
-            free(p->IdReference[i]);
+void freeVecReference(parkingTicketsADT p) {
+    for (size_t i = 0; i < p->dimIdReference; i++) {
+        if (p->idReference[i] != NULL) {
+            free(p->idReference[i]);
         }
     }
     free(p->idReference);
-    return;
 }
 
 void freeParkingTickets(parkingTicketsADT p){
     freeListAgRec(p->firstAgency);
     freeListCountRec(p->firstCount);
     freeListAlphaRec(p->firstAlpha);
-    freeVecReference(p->idReference);
+    freeVecReference(p);
     free(p);
 }
