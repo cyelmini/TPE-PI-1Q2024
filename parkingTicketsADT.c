@@ -48,17 +48,15 @@ typedef struct nodeInfAlpha{
 typedef TNodeInfAlpha * TListInfAlpha;
 
 struct parkingTicketsCDT{
-    TListAg firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order
+    TListAg firstAgency;  //Pointer to the first element of the list of agencies, which is added in alphabetical order
     TListAg iterAg;
-    TListInfCount firstCount; // Pointer to the first element of the list of infractions ordered by infraction count
+    TListInfCount firstCount; //Pointer to the first element of the list of infractions ordered by infraction count
     TListInfCount iterCount;
-    TListInfAlpha firstAlpha; //  Pointer to the first element of the list of infractions ordered alphabetically
+    TListInfAlpha firstAlpha; //Pointer to the first element of the list of infractions ordered alphabetically
     TListInfAlpha iterAlpha;
-    char** idReference;       // Vector where the position is the ticketId and the dim of the vector
-    size_t dimIdReference;
+    char** idReference;   //Vector where the position is the infractionId
+    size_t dimIdReference; //Dimension of the vector
 };
-
-///////////////////////////////functions VV
 
 parkingTicketsADT newParking(void) {
     errno = OK;
@@ -71,22 +69,21 @@ parkingTicketsADT newParking(void) {
     return aux;
 }
 
-
-void addInfraction(parkingTickesADT adt,size_t infractionId,const char* description){
+void addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
     errno = OK;
-    if(infractionId>adt->dimIdReference){
-        adt->idReference=realloc(adt->idReference,infractionId*sizeof(char*))
-        if(adt->dimIdReference==NULL){
-            errno=ERROR_MEM;
-            return NULL;
-        }else{
-            adt->dimIdReference=infractionId;
-            strcpy(adt->idReference[infractionId],description);
+    if(infractionId >= p->dimIdReference){
+        char **temp = realloc(adt->idReference, (infractionId + 1) * sizeof(char *));
+        if(temp == NULL){
+            errno = ERROR_MEM;
+            return;
+        } else {
+            p->idReference = temp;
+            p->dimIdReference = infractionId;
+            strcpy(p->idReference[infractionId], description);
         }    
-    }else{
-        strcpy(adt->idReference[infractionId],description);
+    } else {
+        strcpy(p->idReference[infractionId], description);
     }
-    return;
 }
 
 static TListPlate addPlateRec(TListPlate list, const char *plate, size_t * newCount) {
@@ -173,7 +170,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
 
 int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate) {
     int flag = 0;
-    if(agency == NULL || infractionDesc == NULL || plate ==  NULL){
+    if(agency == NULL || || plate ==  NULL){
         errno = ERROR_ARG;
         return flag;
     }
@@ -328,13 +325,13 @@ static void freeListCountRec(TListInfCount list){
 }
 
 static freePlateRec(TListPlate list){
-if(list == NULL){
-return;
-}
-TListPlate aux = list;
-list = list->tail;
-free(aux);
-freePlateRec(list);
+    if(list == NULL){
+        return;
+    }
+    TListPlate aux = list;
+    list = list->tail;
+    free(aux);
+    freePlateRec(list);
 }
 
 static void freeInfraction(TInfraction * infractions, int size){
