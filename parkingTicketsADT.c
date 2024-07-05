@@ -66,11 +66,16 @@ parkingTicketsADT newParking(void) {
         errno = ERROR_MEM;
         return NULL;
     }
+    aux->dimIdReference=0;
+    aux->idReference=NULL;
     return aux;
 }
 
 void addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
     errno = OK;
+
+    //validar datos////////////////////////////////////////////
+
     if(infractionId >= p->dimIdReference){
         char **temp = realloc(adt->idReference, (infractionId + 1) * sizeof(char *));
         if(temp == NULL){
@@ -78,12 +83,23 @@ void addInfraction(parkingTickesADT p, size_t infractionId, const char* descript
             return;
         } else {
             p->idReference = temp;
+            for(int i=(p->dimIdReference+1),i<=infractionId,i++){
+                p->idReference[i]=NULL;
+            }
             p->dimIdReference = infractionId;
-            strcpy(p->idReference[infractionId], description);
+            strcpy(p->idReference[infractionId], description); 
         }    
-    } else {
-        strcpy(p->idReference[infractionId], description);
-    }
+    } else  if(p->idReference[infractionId]==NULL){
+        char** temp2=malloc(MAX_DESC*sizeof(char));
+        if(temp2 == NULL){
+            errno = ERROR_MEM;
+            return;
+        } else {
+            p->idReference[infractionId]=temp2;
+            strcpy(p->idReference[infractionId], description);
+        }
+    }//else ya estaba agregado no hace nada
+    return;
 }
 
 static TListPlate addPlateRec(TListPlate list, const char *plate, size_t * newCount) {
@@ -356,6 +372,6 @@ void freeParkingTickets(parkingTicketsADT p){
     freeListAgRec(p->firstAgency);
     freeListCountRec(p->firstCount);
     freeListAlphaRec(p->firstAlpha);
-    free(p->idReference);
+    free(p->idReference);   //maaaaaaaal
     free(p);
 }
