@@ -356,5 +356,7 @@ void freeParkingTickets(parkingTicketsADT p){
     freeListAgRec(p->firstAgency);
     freeListCountRec(p->firstCount);
     freeListAlphaRec(p->firstAlpha);
+    free(p->IdReference);
+    free(p->dimIdReference);
     free(p);
 }
