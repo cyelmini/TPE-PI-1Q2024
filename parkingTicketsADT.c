@@ -44,7 +44,6 @@ typedef struct nodeInfAlpha{
     size_t plateCount; //Amount of times it committed it
     nodeInfAlpha * tail;
 }TNodeInfAlpha;
-
 typedef TNodeInfAlpha * TListInfAlpha;
 
 struct parkingTicketsCDT{

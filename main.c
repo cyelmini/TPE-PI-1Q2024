@@ -3,6 +3,8 @@
 #include "htmlTable.h"
 #include "parkingTicketsADT.h"
 
+/* RECORDATORIO: VER TEMA MAGIC NUMBERS Y DEFINES */
+
 #define MAX_CHARS 80 // Each line of file can have up to 80 chars
 #define DELIM ";"
 #define IS_NYC 0
