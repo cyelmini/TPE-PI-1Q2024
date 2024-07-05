@@ -10,10 +10,15 @@
 
 typedef struct parkingTicketsCDT * parkingTicketsADT;
 
+/* Generates a system to process the data of the different
+* infractions committed
+*/
+parkingTicketsADT newParking(void);
+
 /* Adds an infraction committed by a given plate to the correspondent agency that emitted it.
- * If the agency did not exist, it adds it to the list as well. Returns 1 if successfully done
- * and 0 if not.
- */
+* If the agency did not exist, it adds it to the list as well. Returns 1 if successfully done
+* and 0 if not.
+*/
 int addInfraction(parkingTicketsADT p, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate);
 
 /* Generates two lists of infractions that are sorted by
@@ -29,7 +34,7 @@ void sortList(parkingTicketsADT p);
 void toBeginAg(parkingTicketsADT p);
 
 /* Returns 1 if there are more elements on the lists of agencies to
- * iterate over, 0 is there are not.
+* iterate over, 0 is there are not.
 */
 int hasNextAg(parkingTicketsADT p);
 
