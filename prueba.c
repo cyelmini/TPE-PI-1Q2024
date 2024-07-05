@@ -63,7 +63,7 @@ typedef TNodeInfAlpha * TListInfAlpha;
 ///////////////////////////////functions VV
 
 void addInfraction(parkingTickesADT adt,size_t infractionId,const char* description){
-    if(infractionId>adt->dimIdReference){
+    if(infractionId>adt->dimIdReference){///////////////////////////////////////////////////////////// hay que chequiar el error
         adt->idReference=realloc(adt->idReference,infractionId*sizeof(char*))
         adt->dimIdReference=infractionId;
         strcpy(adt->idReference[infractionId],description);
@@ -166,7 +166,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
     return list;
 }
 
-int addTicket(parkingTicketsADT p, const char *agency,/* const char *infractionDesc,*/ size_t infractionId, const char *plate) {
+int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate) {
     int flag = 0;
     if(agency == NULL || infractionDesc == NULL || plate ==  NULL){
         errno = ERROR_ARG;
