@@ -3,24 +3,21 @@
 #include "htmlTable.h"
 #include "parkingTicketsADT.h"
 
-#define MAX_CHARS 50 // Each line of file can have up to 50 chars
+#define MAX_CHARS 80 // Each line of file can have up to...
 #define DELIM ";"
-#define IS_NYC 1
-#define IS_CHI 0
+#define IS_NYC 0
+#define IS_CHI 1
 #define END_OF_LINE "/n"
 
-/* Reads the .csv file for tickets and extracts the plate, infractionId,
-* fineAmount and the issuingAgency and returns a new ADT with the processed data
-*/
-parkingTicketsADT readTickets(FILE * fileTickets, parkingTicketsADT infraction);
+// Reads the .csv file for tickets and extracts the plate, infractionId,
+// fineAmount and the issuingAgency. Then updates de ADT with the file data
+void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city);
 
 
-/* Reads the.csv file for infractions and extracts the id and the description of
-* the infraction, returns a new ADT with the processed data
-*/
-parkingTicketsADT readInfractions(FILE * fileInfractions, parkingTicketsADT infraction);
+// Reads the.csv file for infractions and extracts the id and the description of
+// the infraction. Then updates de ADT with the file data
+void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction);
 
-int readCity(char * line);
 
 int main(int argc, char * argv[]){
 
@@ -37,43 +34,135 @@ int main(int argc, char * argv[]){
         exit(ERROR_OPEN);
     }
 
+    int city;
+    parkingTicketsADT infraction = newParking();
+
+    readTickets(fileTickets, infraction, &city);
+    readInfractions(fileInfractions, infraction);
     
-    while()
+    freeParkingTickets(infraction);
 }
 
-parkingTicketsADT readTickets(FILE * fileTickets, parkingTicketsADT infraction){
+void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
     char line[MAX_CHARS];
     char * temp;
 
-    fscanf(fileTickets, "%s\n", line); 
-    
-    if(line == NULL){
-        return NULL;
+    //me parece que esta condicion no hay que chequearla por enunciado
+    if (fscanf(fileTickets, "%s\n", line) != 1) {
+        fprintf(stderr, "Error reading first line\n");
+        exit(ERROR_READ);
     }
-    
+
+    size_t id;
+    char description[51];
+    while(fgets(line, MAX_CHARS, fileInfractions)!= NULL){
+        temp = strtok(line, DELIM);
+        if(temp == NULL){
+            printf(stderr, "Error in Tok");
+            exit(ERROR_TOKEN);
+        }
+        id = temp(atoi);
+
+        temp = strtok(line, DELIM);
+        if(temp == NULL){
+            printf(stderr, "Error in Tok");
+            exit(ERROR_TOKEN);
+        }
+        strncpy(description, temp, sizeof(description) - 1);
+        plate[sizeof(description) - 1] = '\0';
+
+        //Falta la funcion que agrega la info de la infraccion al TAD
+    }
+}
+
+void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
+    char line[MAX_CHARS];
+    char * temp;
+
+    if (fscanf(fileTickets, "%s\n", line) != 1) {
+        fprintf(stderr, "Error reading first line\n");
+        exit(ERROR_READ);
+    }
+
     temp = strtok(line, DELIM);
+    
     //Based on the first parameter, it decides whether it is NYC or CHI
-    if(strcmp(temp, "plate") == 0){
-        char * plate;
+    if(strcmp(temp, "plate") == IS_NYC){
+        *city = IS_NYC
+        char plate[11];
         size_t infractionId;
-        char * issuingAgency;
-         if(fgets(line, MAX_CHARS, fileTickets) != NULL){
+        char issuingAgency[36];
+
+        while(fgets(line, MAX_CHARS, fileTickets)!= NULL){
             temp = strtok(NULL, DELIM);
             if(temp == NULL){
                 printf(stderr, "Error in Tok");
                 exit(ERROR_TOKEN);
             }
-            plate = temp;
+            strncpy(plate, temp, sizeof(plate) - 1);
+            plate[sizeof(plate) - 1] = '\0';
             //Ignore this temp because the issueDate is not needed for the queries
+            strtok(NULL, DELIM);
+
             temp = strtok(NULL, DELIM);
-            temp = strtok(NULL, DELIM);
+            if(temp == NULL){
+                printf(stderr, "Error in Tok");
+                exit(ERROR_TOKEN);
+            }
             infractionId = atoi(temp);
             //Ignore this temp because the fineAmount is not needed for the queries
+            strtok(NULL, END_OF_LINE);
+
+            temp = strtok(NULL, DELIM);
+            if(temp == NULL){
+                printf(stderr, "Error in Tok");
+                exit(ERROR_TOKEN);
+            }
+            strncpy(issuingAgency, temp, sizeof(issuingAgency) - 1);
+            plate[sizeof(issuingAgency) - 1] = '\0';
+
+            //Falta la funcion que agrega la info del ticket al TAD
+            
+        }
+    } else{ //the file belongs to ticketsCHI
+        *city = IS_CHI;
+        char plateRedacted[11];
+        char unitDescription[14];
+        size_t infractionCode;
+
+        while(fgets(line, MAX_CHARS, fileTickets)!= NULL){
+            //Ignore this temp beacuse the issueDate is not needed
+            temp = strtok(NULL, DELIM);
+
+            temp = strtok(NULL, DELIM);
+            if(temp == NULL){
+                printf(stderr, "Error in Tok");
+                exit(ERROR_TOKEN);
+            }
+            strncpy(plateRedacted, temp, sizeof(plateRedacted) - 1);
+            plateRedacted[sizeof(plateRedacted) - 1] = '\0';
+            
+            temp = strtok(NULL, DELIM);
+            if(temp == NULL){
+                printf(stderr, "Error in Tok");
+                exit(ERROR_TOKEN);
+            }
+            strncpy(unitDescription, temp, sizeof(unitDescription) - 1);
+            unitDescription[sizeof(unitDescription) - 1] = '\0';
+
             temp = strtok(NULL, END_OF_LINE);
-            issuingAgency = temp;
+            if(temp == NULL){
+                printf(stderr, "Error in Tok");
+                exit(ERROR_TOKEN);
+            }
+            infractionCode = atoi(temp);
+
+            //Falta la funcion que agrega la info del ticket al TAD
         }
     }
 }
+
+
 /*---------------------------------------------- QUERIES -----------------------------------------------------------*/
 
 /* TOTAL DE MULTAS POR INFRACCION

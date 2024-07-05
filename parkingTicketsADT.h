@@ -76,7 +76,7 @@ char * nextAlpha(parkingTicketsADT p, char ** maxPlate, size_t * infractionCount
 /* Frees the memory reserved by the ADT */
 void freeParkingTickets(parkingTicketsADT p);
 
-enum {OK = 0, ERROR_MEM, ERROR_TOK, ERROR_ARG, ERROR_OPEN, NEXT_ERROR};
+enum {OK = 0, ERROR_MEM, ERROR_TOK, ERROR_ARG, ERROR_OPEN, NEXT_ERROR, ERROR_READ};
 
 /*
  * ERROR_MEM = Memory error
