@@ -15,9 +15,9 @@ typedef struct parkingTicketsCDT * parkingTicketsADT;
 */
 parkingTicketsADT newParking(void);
 
-/* Generataes a refference for the inputed infraction id and
-* the infraction description
-* shuld be filled beofre inputing the tickets
+/* Generates a reference for the inputted infraction id and
+* the infraction description. Should be filled before inputting
+* the tickets.
 */
 void addInfraction(parkingTicketsADT adt,size_t infractionId,const char* description);
 

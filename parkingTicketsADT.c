@@ -58,6 +58,17 @@ struct parkingTicketsCDT{
     size_t dimIdReference;
 };
 
+parkingTicketsADT newParking(void) {
+    errno = OK;
+    parkingTicketsADT aux = calloc(1, sizeof(struct parkingTicketsCDT));
+
+    if (aux == NULL) {
+        errno = ERROR_MEM;
+        return NULL;
+    }
+    return aux;
+}
+
 ///////////////////////////////functions VV
 
 void addInfraction(parkingTickesADT adt,size_t infractionId,const char* description){
@@ -69,17 +80,6 @@ void addInfraction(parkingTickesADT adt,size_t infractionId,const char* descript
         strcpy(adt->idReference[infractionId],description);
     }
     return;
-}
-
-parkingTicketsADT newParking(void) {
-    errno = OK;
-    parkingTicketsADT aux = calloc(1, sizeof(struct parkingTicketsCDT));
-
-    if (aux == NULL) {
-        errno = ERROR_MEM;
-        return NULL;
-    }
-    return aux;
 }
 
 static TListPlate addPlateRec(TListPlate list, const char *plate, size_t * newCount) {

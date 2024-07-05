@@ -14,7 +14,6 @@
 */
 parkingTicketsADT readTickets(FILE * fileTickets, parkingTicketsADT infraction);
 
-
 /* Reads the.csv file for infractions and extracts the id and the description of
 * the infraction, returns a new ADT with the processed data
 */
@@ -82,7 +81,6 @@ parkingTicketsADT readTickets(FILE * fileTickets, parkingTicketsADT infraction){
  * descending order by the total number of fines, and if there is a tie, sort alphabetically
  * by the name of the violation.
  */
-
 void query1(parkingTicketsADT p){
     FILE * query1 = fopen("query1.csv", "wt");
     if(query1 == NULL){
@@ -108,7 +106,6 @@ void query1(parkingTicketsADT p){
  * issuing agency, consider the infraction with the lowest alphabetical order.
  * The information should be listed in alphabetical order by issuing agency.
  */
-
 void query2(parkingTicketsADT p){
     FILE * query2 = fopen("query2.csv", "wt");
     if(query2 == NULL){
@@ -134,7 +131,6 @@ void query2(parkingTicketsADT p){
  * infraction, consider the license plate with the lowest alphabetical order. The information should be listed
  * in alphabetical order by infraction.
  */
-
 void query3(parkingTicketsADT p){
     FILE * query3 = fopen("query3.csv", "wt");
     toBeginAlpha(p);
