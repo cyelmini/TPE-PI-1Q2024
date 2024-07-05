@@ -54,7 +54,7 @@ struct parkingTicketsCDT{
     TListInfCount iterCount;
     TListInfAlpha firstAlpha; //  Pointer to the first element of the list of infractions ordered alphabetically
     TListInfAlpha iterAlpha;
-    char** idReference;
+    char** idReference;       // Vector where the position is the ticketId and the dim of the vector
     size_t dimIdReference;
 };
 
