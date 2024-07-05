@@ -156,10 +156,6 @@ static TListAg addInfractionRec(TListAg list, const char *agency, const char *in
     return list;
 }
 
-/* Adds an infraction committed by a given plate to the correspondent agency that emitted it.
- * If the agency did not exist, it adds it to the list as well. Returns 1 if successfully done
- * and 0 if not.
- */
 int addInfraction(parkingTicketsADT p, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate) {
     int flag = 0;
     if(agency == NULL || infractionDesc == NULL || plate ==  NULL){
@@ -211,9 +207,6 @@ static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc
     return list;
 }
 
-/* Generates two lists of infractions that are sorted by
-* infraction count (to be used in query 1) and alphabetically (to be used in query 3)
-*/
 void sortList(parkingTicketsADT p) {
     TListAg aux = p->firstAgency;
     while (aux != NULL) {
@@ -225,9 +218,6 @@ void sortList(parkingTicketsADT p) {
     }
 }
 
-/* Functions to iterate over the three main lists meant
-* to resolve the queries
-*/
 void toBeginAg(parkingTicketsADT p){
     if(p == NULL){
         errno = ERROR_ARG;
@@ -299,3 +289,57 @@ char * nextAlpha(parkingTicketsADT p, char * maxPlate, size_t * infractionCount)
     }
 }
 
+static void freeListAlphaRec(TListInfAlpha list){
+    if(list == NULL){
+        return;
+    }
+    TListInfAlpha aux = list;
+    list = list->tail;
+    free(aux);
+    freeListAlphaRec(list);
+}
+
+static void freeListCountRec(TListInfCount list){
+    if(list == NULL){
+        return;
+    }
+    TListInfCount aux = list;
+    list = list->tail;
+    free(aux);
+    freeListCountRec(list);
+}
+
+static freePlateRec(TListPlate list){
+    if(list == NULL){
+        return;
+    }
+    TListPlate aux = list;
+    list = list->plate;
+    free(aux);
+    freePlateRec(list);
+}
+
+static void freeInfraction(TInfraction * infractions, int size){
+    for(int i = 0; i < size; i++){
+        freePlateRec(infractions[i].firstPlate);
+    }
+}
+
+static void freeListAgRec(TListAg list){
+    if(list == NULL){
+        return;
+    }
+    freeInfraction(list->infractions, list->size);
+    free(list->infractions);
+    TListAg aux = list;
+    list = list->tail;
+    free(aux);
+    freeListAgRec(list);
+}
+
+void freeParkingTickets(parkingTicketsADT p){
+    freeListAgRec(p->firstAgency);
+    freeListCountRec(p->firstCount);
+    freeListAlphaRec(p->firstAlpha);
+    free(p);
+}
