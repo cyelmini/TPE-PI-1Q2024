@@ -8,16 +8,23 @@ typedef struct nodePlate{
     size_t count;
     struct nodePlate * tail;
 }TNodePlate;
-
 typedef TNodePlate * TListPlate;
 
 typedef struct infraction{
     char description[MAX_DESC];
     TListPlate firstPlate; // Pointer to the first element of the list containing the different plates that committed the infraction
     char plate[MAX_PLATE]; // Plate that committed the infraction the most
-    size_t maxPlateCount; // Amount of times the plate committed the infraction
-    size_t totalCount; // Total amount of times the infraction was committed
+    size_t maxPlateCount;  // Amount of times the plate committed the infraction
+    size_t totalCount;     // Total amount of times the infraction was committed
 }TInfraction;
+
+//To be used in query1
+typedef struct nodeInfCount{
+    char description[MAX_DESC];
+    size_t count;  // Total amount of infractions committed
+    nodeInfCount * tail;
+} TNodeInfCount;
+typedef TNodeInfCount * TListInfCount;
 
 //To be used in query2
 typedef struct nodeAg{
@@ -28,17 +35,7 @@ typedef struct nodeAg{
     size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector
     struct nodeAg * tail;  // Pointer to the next agency
 } TNodeAg;
-
 typedef TNodeAg * TListAg;
-
-//To be used in query1
-typedef struct nodeInfCount{
-    char description[MAX_DESC];
-    size_t count;  // Total amount of infractions committed
-    nodeInfCount * tail;
-} TNodeInfCount;
-
-typedef TNodeInfCount * TListInfCount;
 
 // To be used in query3
 typedef struct nodeInfAlpha{
@@ -57,7 +54,22 @@ struct parkingTicketsCDT{
     TListInfCount iterCount;
     TListInfAlpha firstAlpha; //  Pointer to the first element of the list of infractions ordered alphabetically
     TListInfAlpha iterAlpha;
+    char** idReference;
+    size_t dimIdReference;
 };
+
+///////////////////////////////functions VV
+
+void addInfraction(parkingTickesADT adt,size_t infractionId,const char* description){
+    if(infractionId>adt->dimIdReference){///////////////////////////////////////////////////////////// hay que chequiar el error
+        adt->idReference=realloc(adt->idReference,infractionId*sizeof(char*))
+        adt->dimIdReference=infractionId;
+        strcpy(adt->idReference[infractionId],description);
+    }else{
+        strcpy(adt->idReference[infractionId],description);
+    }
+    return;
+}
 
 parkingTicketsADT newParking(void) {
     errno = OK;
@@ -93,7 +105,7 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t * newCo
     return list;
 }
 
-static void addInfractionAux(TListAg list, const char *infractionDesc, size_t infractionId, const char *plate) {
+static void addTicketAux(TListAg list, const char *infractionDesc, size_t infractionId, const char *plate) {
     size_t newSize = infractionId + 1;
     if (newSize > list->size) {
         TInfraction * temp = realloc(list->infractions, newSize * sizeof(TInfraction));
@@ -130,7 +142,7 @@ static void addInfractionAux(TListAg list, const char *infractionDesc, size_t in
     }
 }
 
-static TListAg addInfractionRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag) {
+static TListAg addTicketRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag) {
     int c;
     if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not exist
         TListAg newAg = calloc(1, sizeof(TNodeAg));
@@ -139,26 +151,26 @@ static TListAg addInfractionRec(TListAg list, const char *agency, const char *in
             return list;
         }
         strcpy(newAg->agency, agency);
-        addInfractionAux(newAg, infractionDesc, infractionId, plate);
+        addTicketAux(newAg, infractionDesc, infractionId, plate);
         newAg->tail = list;
         *flag = 1;
         return newAg;
     }
     if (c == 0) {
-        addInfractionAux(list, infractionDesc, infractionId, plate);
+        addTicketAux(list, infractionDesc, infractionId, plate);
         return list;
     }
-    list->tail = addInfractionRec(list->tail, agency, infractionDesc, infractionId, plate, flag);
+    list->tail = addTicketRec(list->tail, agency, infractionDesc, infractionId, plate, flag);
     return list;
 }
 
-int addInfraction(parkingTicketsADT p, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate) {
+int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate) {
     int flag = 0;
     if(agency == NULL || infractionDesc == NULL || plate ==  NULL){
         errno = ERROR_ARG;
         return flag;
     }
-    p->firstAgency = addInfractionRec(p->firstAgency, agency, infractionDesc, infractionId, plate, &flag);
+    p->firstAgency = addTicketRec(p->firstAgency, agency, p->idReference[infractionId], infractionId, plate, &flag);
     return flag;
 }
 
@@ -309,13 +321,13 @@ static void freeListCountRec(TListInfCount list){
 }
 
 static freePlateRec(TListPlate list){
-    if(list == NULL){
-        return;
-    }
-    TListPlate aux = list;
-    list = list->tail;
-    free(aux);
-    freePlateRec(list);
+if(list == NULL){
+return;
+}
+TListPlate aux = list;
+list = list->tail;
+free(aux);
+freePlateRec(list);
 }
 
 static void freeInfraction(TInfraction * infractions, int size){
