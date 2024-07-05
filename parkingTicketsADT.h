@@ -21,7 +21,7 @@ int addInfraction(parkingTicketsADT p, const char *agency, const char *infractio
 */
 void sortList(parkingTicketsADT p);
 
-/* Functions to iterate over the three main lists meant to resolve the queries*/
+/* ----------------- Functions to iterate over the three main lists meant to resolve the queries----------------------*/
 
 /* To iterate over the lists of agencies, sets iterator on
 * the first element of such list.
@@ -36,7 +36,7 @@ int hasNextAg(parkingTicketsADT p);
 /* Returns the name of the agency that emitted the infraction, and by parameters the description
 * of the most popular infraction and the amount of times it was committed
 */
-char * nextAg(parkingTicketsADT p, char * mostPopularInf, size_t infractionCount);
+char * nextAg(parkingTicketsADT p, char ** mostPopularInf, size_t infractionCount);
 
 /* To iterate over the lists of infractions ordered by count, sets iterator on
 * the first element of such list.
@@ -66,7 +66,7 @@ int hasNextAlpha(parkingTicketsADT p);
 /* Returns the description of the infraction, and by parameters the plate that committed this infraction
 * the most and the amount of times it did.
 */
-char * nextAlpha(parkingTicketsADT p, char * maxPlate, size_t * infractionCount);
+char * nextAlpha(parkingTicketsADT p, char ** maxPlate, size_t * infractionCount);
 
 /* Frees the memory reserved by the ADT; */
 void freeParkingTickets(parkingTicketsADT p);

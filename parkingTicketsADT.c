@@ -59,10 +59,6 @@ struct parkingTicketsCDT{
     TListInfAlpha iterAlpha;
 };
 
-/* ACORDATE DE PONER LOS COMENTARIOS DE LAS FUNCIONES EN EL .H
- * CUANDO TERMINES !!!!!!!! Y BORRA LOS CAMPOS DE LOS STRUCTS QUE NO USAS*/
-
-
 parkingTicketsADT newParking(void) {
     errno = OK;
     parkingTicketsADT aux = calloc(1, sizeof(struct parkingTicketsCDT));
@@ -232,14 +228,15 @@ int hasNextAg(parkingTicketsADT p){
     return p->iterAg != NULL;
 }
 
-char * nextAg(parkingTicketsADT p, char * mostPopularInf, size_t infractionCount){
-    if(hasNextAg(p)){
+char * nextAg(parkingTicketsADT p, char ** mostPopularInf, size_t * infractionCount){
+    if (hasNextAg(p)) {
         char * ans = p->iterAg->agency;
         *mostPopularInf = p->iterAg->infractions[p->iterAg->maxPosInfraction].description;
         *infractionCount = p->iterAg->infractions[p->iterAg->maxPosInfraction].totalCount;
         p->iterAg = p->iterAg->tail;
         return ans;
     }
+    return NULL;
 }
 
 void toBeginCount(parkingTicketsADT p){
@@ -263,6 +260,7 @@ char * nextCount(parkingTicketsADT p, size_t * count){
         p->iterCount = p->iterCount->tail;
         return ans;
     }
+    return NULL;
 }
 
 void toBeginAlpha(parkingTicketsADT p){
@@ -279,7 +277,7 @@ int hasNextAlpha(parkingTicketsADT p){
     return p->iterAlpha != NULL;
 }
 
-char * nextAlpha(parkingTicketsADT p, char * maxPlate, size_t * infractionCount){
+char * nextAlpha(parkingTicketsADT p, char ** maxPlate, size_t * infractionCount){
     if(hasNextAlpha(p)){
         char * ans = p->iterAlpha->description;
         *maxPlate = p->iterAlpha->plate;
@@ -287,6 +285,7 @@ char * nextAlpha(parkingTicketsADT p, char * maxPlate, size_t * infractionCount)
         p->iterAlpha = p->iterAlpha->tail;
         return ans;
     }
+    return NULL;
 }
 
 static void freeListAlphaRec(TListInfAlpha list){
