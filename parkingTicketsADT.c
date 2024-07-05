@@ -70,7 +70,6 @@ parkingTicketsADT newParking(void) {
 }
 
 void addInfraction(parkingTickesADT p, size_t infractionId, const char* description){
-    errno = OK;
     if(infractionId >= p->dimIdReference){
         char **temp = realloc(adt->idReference, (infractionId + 1) * sizeof(char *));
         if(temp == NULL){
