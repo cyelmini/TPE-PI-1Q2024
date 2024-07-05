@@ -87,13 +87,13 @@ int addInfraction(parkingTickesADT p, size_t infractionId, const char* descripti
             strcpy(p->idReference[infractionId], description); 
         }    
     } else if(p->idReference[infractionId] == NULL){
-        char** temp2=malloc((MAX_DESC+1)*sizeof(char));
+        char* temp2=malloc((MAX_DESC+1)*sizeof(char));
         if(temp2 == NULL){
             errno = ERROR_MEM;
             return ret;
-        } else {
-            p->idReference[infractionId] = temp2;  // Incompatible pointer types assigning to 'char *' from 'char **'; dereference with *
-            strcpy(p->idReference[infractionId], description);
+        } else {                                   //                                   O/
+            p->idReference[infractionId] = temp2;  // Warnind (no deberia estar mas)   /|
+            strcpy(p->idReference[infractionId], description);                    //   / \
         }
     }
     return ret;
