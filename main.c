@@ -78,7 +78,7 @@ int main(int argc, char * argv[]){
 }
 
 void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
-    char line[MAX_CHARS];
+    char line[MAX_CHARS];  //////////////////////////////// (no va aser MAX_DESC???)
     char * temp;
 
     //me parece que esta condicion no hay que chequearla por enunciado
@@ -88,7 +88,7 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
     }
 
     size_t id;
-    char description[51];
+    char description[51]; //////////////////////////////////////////////magic number
     while(fgets(line, MAX_CHARS, fileInfractions)!= NULL){
         temp = strtok(line, DELIM);
         if(temp == NULL){
@@ -106,9 +106,13 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
         plate[sizeof(description) - 1] = '\0';
 
         //Falta la funcion que agrega la info de la infraccion al TAD
+        /*
+        * int addInfraction(parkingTicketsADT adt,size_t infractionId,const char* description);  //prototipo
+        * // y ver errores en el .h
+        */
     }
 }
-
+//                                                                               <3
 void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
     char line[MAX_CHARS];
     char * temp;
@@ -156,6 +160,9 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
             issuingAgency[sizeof(issuingAgency) - 1] = '\0';
 
             //Falta la funcion que agrega la info del ticket al TAD
+            /*
+            * int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate); //prototipo
+            */
             
         }
     } else{ //the file belongs to ticketsCHI

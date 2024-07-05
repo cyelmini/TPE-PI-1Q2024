@@ -17,8 +17,9 @@ parkingTicketsADT newParking(void);
 /* Generates a reference for the inputted infraction id and
 * the infraction description. Should be filled before inputting
 * the tickets.
+* will return ???
 */
-void addInfraction(parkingTicketsADT adt,size_t infractionId,const char* description);
+int addInfraction(parkingTicketsADT adt,size_t infractionId,const char* description);
 
 /* Adds an infraction committed by a given plate to the correspondent agency that emitted it.
 * If the agency did not exist, it adds it to the list as well. Returns 1 if successfully done
