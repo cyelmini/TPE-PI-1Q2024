@@ -58,6 +58,8 @@ struct parkingTicketsCDT{
     size_t dimIdReference;
 };
 
+///////////////////////////////functions VV
+
 parkingTicketsADT newParking(void) {
     errno = OK;
     parkingTicketsADT aux = calloc(1, sizeof(struct parkingTicketsCDT));
@@ -69,13 +71,18 @@ parkingTicketsADT newParking(void) {
     return aux;
 }
 
-///////////////////////////////functions VV
 
 void addInfraction(parkingTickesADT adt,size_t infractionId,const char* description){
-    if(infractionId>adt->dimIdReference){///////////////////////////////////////////////////////////// hay que chequiar el error
+    errno = OK;
+    if(infractionId>adt->dimIdReference){
         adt->idReference=realloc(adt->idReference,infractionId*sizeof(char*))
-        adt->dimIdReference=infractionId;
-        strcpy(adt->idReference[infractionId],description);
+        if(adt->dimIdReference==NULL){
+            errno=ERROR_MEM;
+            return NULL;
+        }else{
+            adt->dimIdReference=infractionId;
+            strcpy(adt->idReference[infractionId],description);
+        }    
     }else{
         strcpy(adt->idReference[infractionId],description);
     }
