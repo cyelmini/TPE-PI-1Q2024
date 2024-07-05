@@ -14,10 +14,12 @@ typedef TNodePlate * TListPlate;
 typedef struct infraction{
     char description[MAX_DESC];
     TListPlate firstPlate; // Pointer to the first element of the list containing the different plates that committed the infraction
-    size_t count; // Total amount of times the infraction was committed
+    char plate[MAX_PLATE]; // Plate that committed the infraction the most
+    size_t maxPlateCount; // Amount of times the plate committed the infraction
+    size_t totalCount; // Total amount of times the infraction was committed
 }TInfraction;
 
-// To be used in query1
+//To be used in query2
 typedef struct nodeAg{
     char agency[MAX_AG];
     TInfraction * infractions; // Vector containing the different infractions issued by the correspondent agency (each position in this vector corresponds with the infractionId)
@@ -29,7 +31,7 @@ typedef struct nodeAg{
 
 typedef TNodeAg * TListAg;
 
-//To be used in query2
+//To be used in query1
 typedef struct nodeInfCount{
     char description[MAX_DESC];
     size_t count;  // Total amount of infractions committed
@@ -42,7 +44,7 @@ typedef TNodeInfCount * TListInfCount;
 typedef struct nodeInfAlpha{
     char description[MAX_DESC];
     char plate[MAX_PLATE]; //Plate that committed the infraction the most
-    size_t count; //Amount of times it committed it
+    size_t plateCount; //Amount of times it committed it
     nodeInfAlpha * tail;
 }TNodeInfAlpha;
 
@@ -50,12 +52,15 @@ typedef TNodeInfAlpha * TListInfAlpha;
 
 struct parkingTicketsCDT{
     TListAg firstAgency;  // Pointer to the first element of the list of agencies, which is added in alphabetical order
+    TListAg iterAg;
     TListInfCount firstCount; // Pointer to the first element of the list of infractions ordered by infraction count
+    TListInfCount iterCount;
     TListInfAlpha firstAlpha; //  Pointer to the first element of the list of infractions ordered alphabetically
+    TListInfAlpha iterAlpha;
 };
 
 /* ACORDATE DE PONER LOS COMENTARIOS DE LAS FUNCIONES EN EL .H
- * CUANDO TERMINES !!!!!!!! */
+ * CUANDO TERMINES !!!!!!!! Y BORRA LOS CAMPOS DE LOS STRUCTS QUE NO USAS*/
 
 
 parkingTicketsADT newParking(void) {
@@ -69,9 +74,9 @@ parkingTicketsADT newParking(void) {
     return aux;
 }
 
-static TListPlate addPlateRec(TListPlate list, const char *plate) {
+static TListPlate addPlateRec(TListPlate list, const char *plate, size_t * newCount) {
     int c;
-    if (list == NULL || (c = strcmp(list->plate, plate)) > 0) { // Plate has not yet been added
+    if (list == NULL || (c = strcasecmp(list->plate, plate)) > 0) { // Plate has not yet been added
         TListPlate newPlate = malloc(sizeof(TNodePlate));
         if (newPlate == NULL) {
             errno = ERROR_MEM;
@@ -79,14 +84,16 @@ static TListPlate addPlateRec(TListPlate list, const char *plate) {
         }
         strcpy(newPlate->plate, plate);
         newPlate->count = 1;
+        *newCount = newPlate->count;
         newPlate->tail = list;
         return newPlate;
     }
     if (c == 0) {
         list->count++;
+        *newCount = list->count;
         return list;
     }
-    list->tail = addPlateRec(list->tail, plate);
+    list->tail = addPlateRec(list->tail, plate, newCount);
     return list;
 }
 
@@ -100,19 +107,28 @@ static void addInfractionAux(TListAg list, const char *infractionDesc, size_t in
         }
         list->infractions = temp;
         for (size_t i = list->size; i < newSize; i++) {
-            list->infractions[i].description[0] = '\0';
+            list->infractions[i].description = NULL;
             list->infractions[i].firstPlate = NULL;
-            list->infractions[i].count = 0;
+            list->infractions[i].plate = NULL;
+            list->infractions[i].maxPlateCount = 0;
+            list->infractions[i].totalCount = 0;
         }
         list->size = newSize;
     }
-    if (list->infractions[infractionId].description[0] == '\0') {
+    if (list->infractions[infractionId].count == 0) {
         strcpy(list->infractions[infractionId].description, infractionDesc);
     }
-    list->infractions[infractionId].firstPlate = addPlateRec(list->infractions[infractionId].firstPlate, plate);
-    list->infractions[infractionId].count++;
 
-    if (list->infractions[infractionId].count > list->infractions[list->maxPosInfraction].count) {
+    size_t newCount;
+    list->infractions[infractionId].firstPlate = addPlateRec(list->infractions[infractionId].firstPlate, plate, &newCount);
+    list->infractions[infractionId].totalCount++;
+
+    if(newCount > list->infractions[infractionId].maxPlateCount){
+        list->infractions[infractionId].maxPlateCount = newCount;
+        strcpy(list->infractions[infractionId].plate, plate);
+    }
+
+    if(list->infractions[infractionId].count > list->infractions[list->maxPosInfraction].count) {
         list->maxPosInfraction = infractionId;
     }
     list->totalCount++;
@@ -146,6 +162,10 @@ static TListAg addInfractionRec(TListAg list, const char *agency, const char *in
  */
 int addInfraction(parkingTicketsADT p, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate) {
     int flag = 0;
+    if(agency == NULL || infractionDesc == NULL || plate ==  NULL){
+        errno = ERROR_ARG;
+        return flag;
+    }
     p->firstAgency = addInfractionRec(p->firstAgency, agency, infractionDesc, infractionId, plate, &flag);
     return flag;
 }
@@ -154,6 +174,10 @@ static TListInfCount sortByCountRec(TListInf list, char * infractionDesc, size_t
     int c;
     if(list == NULL || (list->count > count)){
         TListInf newInf = malloc(sizeof(TNodeInf));
+        if (newInf == NULL) {
+            errno = ERROR_MEM;
+            return list;
+        }
         strcpy(newInf->description, infractionDesc);
         newInf->count = count;
         newInf->tail = list;
@@ -164,23 +188,6 @@ static TListInfCount sortByCountRec(TListInf list, char * infractionDesc, size_t
     }
     list->tail = sortByCountRec(list->tail, infractionDesc, count);
     return list;
-}
-
-static char * maxPlate(TListPlate list, size_t * count) {
-    int maxCount = 0;
-    char * maxPlate = NULL;
-    TListPlate aux = list;
-    while (aux != NULL) {
-        if (aux->count > maxCount) {
-            maxPlate = aux->plate;
-            maxCount = aux->count;
-        }
-        aux = aux->tail;
-    }
-    if (count != NULL) {
-        *count = maxCount;
-    }
-    return maxPlate;
 }
 
 static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate) {
@@ -212,12 +219,83 @@ void sortList(parkingTicketsADT p) {
     while (aux != NULL) {
         for (size_t i = 0; i < aux->size; i++) {
             p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].count);
-            size_t maxCount = 0;
-            char * maxPlateStr = maxPlate(aux->infractions[i].firstPlate, &maxCount);
-            if (maxPlateStr != NULL) {
-                p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, maxCount, maxPlateStr);
-            }
+            p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate);
         }
         aux = aux->tail;
     }
 }
+
+/* Functions to iterate over the three main lists meant
+* to resolve the queries
+*/
+void toBeginAg(parkingTicketsADT p){
+    if(p == NULL){
+        errno = ERROR_ARG;
+    }
+    p->iterAg = p->firstAgency;
+}
+
+int hasNextAg(parkingTicketsADT p){
+    if(p == NULL){
+        errno = ERROR_ARG;
+    }
+    return p->iterAg != NULL;
+}
+
+char * nextAg(parkingTicketsADT p, char * mostPopularInf, size_t infractionCount){
+    if(hasNextAg(p)){
+        char * ans = p->iterAg->agency;
+        *mostPopularInf = p->iterAg->infractions[p->iterAg->maxPosInfraction].description;
+        *infractionCount = p->iterAg->infractions[p->iterAg->maxPosInfraction].totalCount;
+        p->iterAg = p->iterAg->tail;
+        return ans;
+    }
+}
+
+void toBeginCount(parkingTicketsADT p){
+    if(p == NULL){
+        errno = ERROR_ARG;
+    }
+    p->iterCount = p->firstCount;
+}
+
+int hasNextCount(parkingTicketsADT p){
+    if(p == NULL){
+        errno = ERROR_ARG;
+    }
+    return p->iterCount != NULL;
+}
+
+char * nextCount(parkingTicketsADT p, size_t * count){
+    if(hasNextCount(p)){
+        char * ans = p->iterCount->description;
+        *count = p->iterCount->count;
+        p->iterCount = p->iterCount->tail;
+        return ans;
+    }
+}
+
+void toBeginAlpha(parkingTicketsADT p){
+    if(p == NULL){
+        errno = ERROR_ARG;
+    }
+    p->iterAlpha = p->firstAlpha;
+}
+
+int hasNextAlpha(parkingTicketsADT p){
+    if(p == NULL){
+        errno = ERROR_ARG;
+    }
+    return p->iterAlpha != NULL;
+}
+
+char * nextAlpha(parkingTicketsADT p, char * maxPlate, size_t * infractionCount){
+    if(hasNextAlpha(p)){
+        char * ans = p->iterAlpha->description;
+        *maxPlate = p->iterAlpha->plate;
+        *infractionCount = p->iterAlpha->plateCount;
+        p->iterAlpha = p->iterAlpha->tail;
+        return ans;
+    }
+}
+
