@@ -60,7 +60,7 @@ parkingTicketsADT readTickets(FILE * fileTickets, parkingTicketsADT infraction){
          if(fgets(line, MAX_CHARS, fileTickets) != NULL){
             temp = strtok(NULL, DELIM);
             if(temp == NULL){
-                printf(stderr, "Error in Tok");
+                fprintf(stderr, "Token error\n");
                 exit(ERROR_TOKEN);
             }
             plate = temp;
