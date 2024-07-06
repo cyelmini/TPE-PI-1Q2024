@@ -83,8 +83,8 @@ void checkTok(char * temp){
     }
 }
 
-void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
-    char line[MAX_CHARS]; 
+void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction) {
+    char line[MAX_CHARS];
     char * temp;
     int ok;
 
@@ -100,10 +100,10 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
         checkTok(temp);
         id = atoi(temp);
 
-        temp = strtok(line, DELIM);
+        temp = strtok(NULL, DELIM);
         checkTok(temp);
-        strncpy(description, temp, sizeof(description) - 1);
-        description[sizeof(description) - 1] = '\0';
+        strncpy(description, temp, strlen(temp));
+        description[strlen(temp)] = '\0';
 
         ok = addInfraction(infraction, id, description);
         if(ok == 0) {
@@ -112,7 +112,8 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
         }
     }
 }
-void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
+
+void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city) {
     char line[MAX_CHARS];
     char * temp;
 
@@ -133,8 +134,8 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
         while(fgets(line, MAX_CHARS, fileTickets)!= NULL){
             temp = strtok(NULL, DELIM);
             checkTok(temp);
-            strncpy(plate, temp, sizeof(plate) - 1);
-            plate[sizeof(plate) - 1] = '\0';
+            strncpy(plate, temp, strlen(temp));
+            plate[strlen(temp)] = '\0';
             //Ignore this temp because the issueDate is not needed for the queries
             strtok(NULL, DELIM);
 
@@ -146,8 +147,8 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
 
             temp = strtok(NULL, END_OF_LINE);
             checkTok(temp);
-            strncpy(issuingAgency, temp, sizeof(issuingAgency) - 1);
-            issuingAgency[sizeof(issuingAgency) - 1] = '\0';
+            strncpy(issuingAgency, temp, strlen(temp));
+            issuingAgency[strlen(temp)] = '\0';
 
             ok = addTicket(infraction, issuingAgency, infractionId, plate);
             if(ok == 0) {
@@ -165,13 +166,13 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
             //Ignore this temp because the issueDate is not needed
             temp = strtok(NULL, DELIM);
             checkTok(temp);
-            strncpy(plateRedacted, temp, sizeof(plateRedacted) - 1);
-            plateRedacted[sizeof(plateRedacted) - 1] = '\0';
-            
+            strncpy(plateRedacted, temp, strlen(temp));
+            plateRedacted[strlen(temp)] = '\0';
+
             temp = strtok(NULL, DELIM);
             checkTok(temp);
-            strncpy(unitDescription, temp, sizeof(unitDescription) - 1);
-            unitDescription[sizeof(unitDescription) - 1] = '\0';
+            strncpy(unitDescription, temp, strlen(temp));
+            unitDescription[strlen(temp)] = '\0';
 
             temp = strtok(NULL, END_OF_LINE);
             checkTok(temp);
@@ -195,17 +196,17 @@ void query1(parkingTicketsADT p){
         exit(ERROR_OPEN);
     }
 
-    char infraction[MAX_T];
+    char infraction[MAX_DESC];
 
     fputs("infraction;tickets\n", query1File);
-    
+
     toBeginCount(p);
     while(hasNextCount(p)){
         size_t infractionCount;
         char * infractionName = nextCount(p, &infractionCount);
         if(infractionName != NULL) {
             fprintf(query1File, "%s;%zu\n", infractionName, infractionCount);
-            snprintf(infraction, sizeof(infraction), "%zu", infractionCount);
+            snprintf(infraction, MAX_DESC, "%zu", infractionCount);
             addHTMLRow(table1, infractionName, infraction);
         }
     }
@@ -222,9 +223,9 @@ void query2(parkingTicketsADT p){
         exit(ERROR_OPEN);
     }
 
-    char infraction[MAX_T];
+    char infraction[MAX_DESC];
 
-    fputs("issuingAgency;infraction;tickets", query2File);
+    fputs("issuingAgency;infraction;tickets\n", query2File);
 
     toBeginAg(p);
     while(hasNextAg(p)) {
@@ -233,7 +234,7 @@ void query2(parkingTicketsADT p){
         char * agency = nextAg(p, &mostPopularInf, &infractionCount);
         if(agency != NULL) {
             fprintf(query2File, "%s;%s;%zu\n", agency, mostPopularInf, infractionCount);
-            snprintf(infraction, sizeof(infraction), "%zu", infractionCount);
+            snprintf(infraction, MAX_DESC, "%zu", infractionCount);
             addHTMLRow(table2, agency, mostPopularInf, infraction);
         }
     }
@@ -250,7 +251,7 @@ void query3(parkingTicketsADT p){
         exit(ERROR_OPEN);
     }
 
-    char infraction[MAX_T];
+    char infraction[MAX_DESC];
 
     toBeginAlpha(p);
     while(hasNextAlpha(p)){
@@ -259,10 +260,11 @@ void query3(parkingTicketsADT p){
         char * infractionName = nextAlpha(p, &maxPlate, &infractionCount);
         if(infractionName != NULL) {
             fprintf(query3File, "%s;%s;%zu\n", infractionName, maxPlate, infractionCount);
-            snprintf(infraction, sizeof(infraction), "%zu", infractionCount);
+            snprintf(infraction, MAX_DESC, "%zu", infractionCount);
             addHTMLRow(table3, infractionName, maxPlate, infraction);
         }
     }
     fclose(query3File);
     closeHTMLTable(table3);
 }
+
