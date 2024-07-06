@@ -170,6 +170,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
     }
     if (c == 0) {
         addTicketAux(list, infractionDesc, infractionId, plate);
+        *flag = 1;
         return list;
     }
     list->tail = addTicketRec(list->tail, agency, infractionDesc, infractionId, plate, flag);
