@@ -63,8 +63,8 @@ int main(int argc, char * argv[]){
     int city;
     parkingTicketsADT infraction = newParking();
 
-    readTickets(fileTickets, infraction, &city);
     readInfractions(fileInfractions, infraction);
+    readTickets(fileTickets, infraction, &city);
     
     fclose(fileTickets);
     fclose(fileInfractions);
