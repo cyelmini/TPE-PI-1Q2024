@@ -8,7 +8,7 @@
 #define DELIM ";"
 #define IS_NYC 0
 #define IS_CHI 1
-#define END_OF_LINE "/n"
+#define END_OF_LINE "\n"
 
 /*  Reads the .csv file for tickets and extracts the plate, infractionId,
 * fineAmount and the issuingAgency. Then updates de ADT with the file data
@@ -142,9 +142,9 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
             checkTok(temp);
             infractionId = atoi(temp);
             //Ignore this temp because the fineAmount is not needed for the queries
-            strtok(NULL, END_OF_LINE);
+            strtok(NULL, DELIM);
 
-            temp = strtok(NULL, DELIM);
+            temp = strtok(NULL, END_OF_LINE);
             checkTok(temp);
             strncpy(issuingAgency, temp, sizeof(issuingAgency) - 1);
             issuingAgency[sizeof(issuingAgency) - 1] = '\0';

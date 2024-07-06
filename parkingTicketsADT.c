@@ -121,7 +121,7 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
     size_t newSize = infractionId + 1;
     if (newSize > list->size) {
         TInfraction * temp = realloc(list->infractions, newSize * sizeof(TInfraction));
-        if (temp == NULL) {
+        if(temp == NULL) {
             errno = ERROR_MEM;
             return;
         }
