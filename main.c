@@ -64,16 +64,24 @@ int main(int argc, char * argv[]){
     parkingTicketsADT p = newParking();
 
     readInfractions(fileInfractions, p);
+    printf("//paso el readInfractions\n");
     readTickets(fileTickets, p, &city);
-    
+    printf("//paso el readTickets\n");
+
     fclose(fileTickets);
+    printf("//paso el fclose\n");
     fclose(fileInfractions);
+    printf("//paso el fclose\n");
 
     query1(p);
+    printf("//paso el query1\n");
     query2(p);
+    printf("//paso el query2\n");
     query3(p);
+    printf("//paso el query3\n");
 
     freeParkingTickets(p);
+    printf("//paso el free\n");
 }
 
 void checkTok(char * temp){
