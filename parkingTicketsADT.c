@@ -1,7 +1,6 @@
 #include "parkingTicketsADT.h"
 #include <errno.h>
 #include <strings.h>
-#include <string.h>
 
 typedef struct nodePlate{
     char plate[MAX_PLATE];
@@ -22,7 +21,7 @@ typedef struct infraction{
 typedef struct nodeInfCount{
     char description[MAX_DESC];
     size_t count;  // Total amount of infractions committed
-    nodeInfCount * tail;
+    struct nodeInfCount * tail;
 } TNodeInfCount;
 typedef TNodeInfCount * TListInfCount;
 
@@ -42,7 +41,7 @@ typedef struct nodeInfAlpha{
     char description[MAX_DESC];
     char plate[MAX_PLATE]; //Plate that committed the infraction the most
     size_t plateCount; //Amount of times it committed it
-    nodeInfAlpha * tail;
+    struct nodeInfAlpha * tail;
 }TNodeInfAlpha;
 typedef TNodeInfAlpha * TListInfAlpha;
 
@@ -128,9 +127,9 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
         }
         list->infractions = temp;
         for (size_t i = list->size; i < newSize; i++) {  //Initialize the new reserved spaces on the vector
-            list->infractions[i].description = NULL;
+            list->infractions[i].description[0] = '\0';
             list->infractions[i].firstPlate = NULL;
-            list->infractions[i].plate = NULL;
+            list->infractions[i].plate[0] = '\0';
             list->infractions[i].maxPlateCount = 0;
             list->infractions[i].totalCount = 0;
         }
@@ -188,7 +187,6 @@ int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, cons
 }
 
 static TListInfCount sortByCountRec(TListInfCount list, const char * infractionDesc, size_t count){
-    int c;
     if(list == NULL || (list->count > count)){
         TListInfCount newInfCount = malloc(sizeof(TNodeInfCount));
         if (newInfCount == NULL) {
@@ -200,7 +198,7 @@ static TListInfCount sortByCountRec(TListInfCount list, const char * infractionD
         newInfCount->tail = list;
         return newInfCount;
     }
-    if(c == 0){
+    if(list->count == count){
         return list;
     }
     list->tail = sortByCountRec(list->tail, infractionDesc, count);
@@ -219,7 +217,7 @@ static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc
         strcpy(newInfAlpha->plate, plate);
         newInfAlpha->plateCount = count;
         newInfAlpha->tail = list;
-        return newInf;
+        return newInfAlpha;
     }
     if (c == 0) {
         return list;
@@ -333,7 +331,7 @@ static void freeListCountRec(TListInfCount list){
     freeListCountRec(list);
 }
 
-static freePlateRec(TListPlate list){
+static void freePlateRec(TListPlate list){
     if(list == NULL){
         return;
     }

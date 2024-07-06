@@ -4,6 +4,7 @@
 #include "parkingTicketsADT.h"
 
 #define MAX_CHARS 80 // Each line of file can have up to 80 chars
+#define MAX_T 10
 #define DELIM ";"
 #define IS_NYC 0
 #define IS_CHI 1
@@ -26,28 +27,19 @@ void checkTok(char * temp);
 
 /* TOTAL FINES PER INFRACTION
  * Each line of the output should contain, separated by “;”, the name of the infraction and
- * the total number of fines for that infraction. The information should be listed in
- * descending order by the total number of fines, and if there is a tie, sort alphabetically
- * by the name of the violation.
+ * the total number of fines for that infraction.
  */
 void query1(parkingTicketsADT p);
 
 /* MOST POPULAR INFRACTION BY ISSUING AGENCY
  * Each line of the output should contain, separated by “;”, the name of the issuing agency,
  * the most popular infraction from that issuing agency, and the corresponding number of fines.
- * The most popular infraction of an issuing agency is the one with the highest number of fines.
- * In case there are two or more infractions with the same number of fines for the same
- * issuing agency, consider the infraction with the lowest alphabetical order.
- * The information should be listed in alphabetical order by issuing agency.
  */
 void query2(parkingTicketsADT p);
 
 /* LICENSE PLATE WITH MOST FINES PER INFRACTION
  * Each line of the output should contain, separated by “;”, the name of the infraction,
  * the license plate with the highest number of fines for that infraction, and the number of fines.
- * In case there are two or more license plates with the same number of fines for the same
- * infraction, consider the license plate with the lowest alphabetical order. The information should be listed
- * in alphabetical order by infraction.
  */
 void query3(parkingTicketsADT p);
 
@@ -87,7 +79,7 @@ int main(int argc, char * argv[]){
 void checkTok(char * temp){
     if(temp == NULL){
             fprintf(stderr, "Token error\n");
-            exit(ERROR_TOKEN);
+            exit(ERROR_TOK);
     }
 }
 
@@ -95,7 +87,7 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
     char line[MAX_CHARS]; 
     char * temp;
     int ok;
-    //me parece que esta condicion no hay que chequearla por enunciado
+
     if (fscanf(fileInfractions, "%s\n", line) != 1) {
         fprintf(stderr, "Error reading first line\n");
         exit(ERROR_READ);
@@ -106,15 +98,15 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction){
     while(fgets(line, MAX_CHARS, fileInfractions) != NULL){
         temp = strtok(line, DELIM);
         checkTok(temp);
-        id = temp(atoi);
+        id = atoi(temp);
 
         temp = strtok(line, DELIM);
         checkTok(temp);
         strncpy(description, temp, sizeof(description) - 1);
-        plate[sizeof(description) - 1] = '\0';
+        description[sizeof(description) - 1] = '\0';
 
         ok = addInfraction(infraction, id, description);
-        if (ok == 0) {
+        if(ok == 0) {
             fprintf(stderr, "Error addInfraction\n");
             exit(errno);
         }
@@ -124,17 +116,16 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
     char line[MAX_CHARS];
     char * temp;
 
-    if (fscanf(fileTickets, "%s\n", line) != 1) {
+    if(fscanf(fileTickets, "%s\n", line) != 1) {
         fprintf(stderr, "Error reading first line\n");
         exit(ERROR_READ);
     }
 
     temp = strtok(line, DELIM);
-    
+    int ok;
     //Based on the first parameter, it decides whether it is NYC or CHI
     if(strcmp(temp, "plate") == IS_NYC){
         *city = IS_NYC;
-        int ok;
         char plate[MAX_PLATE];
         size_t infractionId;
         char issuingAgency[MAX_AG];
@@ -158,12 +149,11 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
             strncpy(issuingAgency, temp, sizeof(issuingAgency) - 1);
             issuingAgency[sizeof(issuingAgency) - 1] = '\0';
 
-            ok = addTicket(infraction);
-            if (ok == 0) {
+            ok = addTicket(infraction, issuingAgency, infractionId, plate);
+            if(ok == 0) {
                 fprintf(stderr, "Error addInfraction\n");
                 exit(errno);
             }
-
         }
     } else { //the file belongs to ticketsCHI
         *city = IS_CHI;
@@ -172,11 +162,9 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
         size_t infractionCode;
 
         while(fgets(line, MAX_CHARS, fileTickets)!= NULL){
-            //Ignore this temp beacuse the issueDate is not needed
+            //Ignore this temp because the issueDate is not needed
             temp = strtok(NULL, DELIM);
-
-            temp = strtok(NULL, DELIM);
-            icheckTok(temp);
+            checkTok(temp);
             strncpy(plateRedacted, temp, sizeof(plateRedacted) - 1);
             plateRedacted[sizeof(plateRedacted) - 1] = '\0';
             
@@ -189,8 +177,8 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city){
             checkTok(temp);
             infractionCode = atoi(temp);
 
-            ok = addTicket(infraction);
-            if (ok == 0) {
+            ok = addTicket(infraction, unitDescription, infractionCode, plateRedacted);
+            if(ok == 0) {
                 fprintf(stderr, "Error addInfraction\n");
                 exit(errno);
             }
@@ -206,7 +194,8 @@ void query1(parkingTicketsADT p){
         fprintf(stderr, "Error in file generation\n");
         exit(ERROR_OPEN);
     }
-    char ans[MAX_CHARS];
+
+    char infraction[MAX_T];
 
     fputs("infraction;tickets\n", query1File);
     
@@ -216,8 +205,8 @@ void query1(parkingTicketsADT p){
         char * infractionName = nextCount(p, &infractionCount);
         if(infractionName != NULL) {
             fprintf(query1File, "%s;%zu\n", infractionName, infractionCount);
-            sprintf(ans, "%zu", infractionCount);
-            addHTMLRow(table1, infractionName, ans);
+            snprintf(infraction, sizeof(infraction), "%zu", infractionCount);
+            addHTMLRow(table1, infractionName, infraction);
         }
     }
     fclose(query1File);
@@ -233,16 +222,19 @@ void query2(parkingTicketsADT p){
         exit(ERROR_OPEN);
     }
 
+    char infraction[MAX_T];
+
     fputs("issuingAgency;infraction;tickets", query2File);
 
     toBeginAg(p);
-    while (hasNextAg(p)) {
+    while(hasNextAg(p)) {
         char * mostPopularInf;
         size_t infractionCount;
         char * agency = nextAg(p, &mostPopularInf, &infractionCount);
         if(agency != NULL) {
             fprintf(query2File, "%s;%s;%zu\n", agency, mostPopularInf, infractionCount);
-            addHTMLRow(table2, agency, mostPopularInf, infractionCount);
+            snprintf(infraction, sizeof(infraction), "%zu", infractionCount);
+            addHTMLRow(table2, agency, mostPopularInf, infraction);
         }
     }
     fclose(query2File);
@@ -258,16 +250,19 @@ void query3(parkingTicketsADT p){
         exit(ERROR_OPEN);
     }
 
+    char infraction[MAX_T];
+
     toBeginAlpha(p);
     while(hasNextAlpha(p)){
         char * maxPlate;
         size_t infractionCount;
         char * infractionName = nextAlpha(p, &maxPlate, &infractionCount);
         if(infractionName != NULL) {
-            fprintf(query3, "%s;%s;%zu\n", infractionName, maxPlate, infractionCount);
-            addHTMLRow(table3, infractionName, maxPlate, infractionCount);
+            fprintf(query3File, "%s;%s;%zu\n", infractionName, maxPlate, infractionCount);
+            snprintf(infraction, sizeof(infraction), "%zu", infractionCount);
+            addHTMLRow(table3, infractionName, maxPlate, infraction);
         }
     }
     fclose(query3File);
-    closeHTMLTable(table3)
+    closeHTMLTable(table3);
 }
