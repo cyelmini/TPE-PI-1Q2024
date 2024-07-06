@@ -4,16 +4,15 @@
 #include "parkingTicketsADT.h"
 
 #define MAX_CHARS 80 // Each line of file can have up to 80 chars
-#define MAX_T 10
+#define MAX_AGENCY 37
 #define DELIM ";"
-#define IS_NYC 0
-#define IS_CHI 1
 #define END_OF_LINE "\n"
+#define HEADER "plate;issueDate;infractionId;fineAmount;issuingAgency"
 
 /*  Reads the .csv file for tickets and extracts the plate, infractionId,
 * fineAmount and the issuingAgency. Then updates de ADT with the file data
 */
-void readTickets(FILE * fileTickets, parkingTicketsADT p, int * city);
+void readTickets(FILE * fileTickets, parkingTicketsADT p);
 
 /* Reads the.csv file for infractions and extracts the id and the description of
 * the infraction. Then updates de ADT with the file data
@@ -60,28 +59,20 @@ int main(int argc, char * argv[]){
         exit(ERROR_OPEN);
     }
 
-    int city;
+
     parkingTicketsADT p = newParking();
 
     readInfractions(fileInfractions, p);
-    printf("//paso el readInfractions\n");
-    readTickets(fileTickets, p, &city);
-    printf("//paso el readTickets\n");
-
+    readTickets(fileTickets, p);
+    
     fclose(fileTickets);
-    printf("//paso el fclose\n");
     fclose(fileInfractions);
-    printf("//paso el fclose\n");
 
     query1(p);
-    printf("//paso el query1\n");
     query2(p);
-    printf("//paso el query2\n");
     query3(p);
-    printf("//paso el query3\n");
 
     freeParkingTickets(p);
-    printf("//paso el free\n");
 }
 
 void checkTok(char * temp){
@@ -105,7 +96,6 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
     size_t id;
     char description[MAX_DESC];
     while(fgets(line, MAX_CHARS, fileInfractions) != NULL){
-        printf("Entre al while\n");
         temp = strtok(line, DELIM);
         checkTok(temp);
         id = atoi(temp);
@@ -121,84 +111,77 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
             exit(errno);
         }
     }
-    printf("Sali del while\n");
 }
 
-void readTickets(FILE * fileTickets, parkingTicketsADT p, int * city) {
-    char line[MAX_CHARS];
+void readTickets(FILE * fileTickets, parkingTicketsADT p) {
+    char text[MAX_CHARS];
+
+    fscanf(fileTickets, "%s\n", text);
     char * temp;
-
-    if(fscanf(fileTickets, "%s\n", line) != 1) {
-        fprintf(stderr, "Error reading first line\n");
-        exit(ERROR_READ);
-    }
-
-    temp = strtok(line, DELIM);
     int ok;
 
-    //Based on the first parameter, it decides whether it is NYC or CHI
-    if(strcmp(temp, "plate") == IS_NYC){
-        *city = IS_NYC;
+    if(strcmp(text, HEADER) == 0){
         char plate[MAX_PLATE];
+        char issuingAgency[MAX_AGENCY];
         size_t infractionId;
-        char issuingAgency[MAX_AG];
 
-        while(fgets(line, MAX_CHARS, fileTickets)!= NULL){
+        while(fgets(text, MAX_CHARS, fileTickets) != NULL){
+            temp = strtok(text, DELIM);
+            checkTok(temp);
+            strcpy(plate, temp);
+        
+
             temp = strtok(NULL, DELIM);
             checkTok(temp);
-            strncpy(plate, temp, strlen(temp));
-            plate[strlen(temp)] = '\0';
-            //Ignore this temp because the issueDate is not needed for the queries
-            strtok(NULL, DELIM);
 
             temp = strtok(NULL, DELIM);
             checkTok(temp);
             infractionId = atoi(temp);
-            //Ignore this temp because the fineAmount is not needed for the queries
-            strtok(NULL, DELIM);
+        
+
+            temp = strtok(NULL, DELIM);
+            checkTok(temp);
 
             temp = strtok(NULL, END_OF_LINE);
             checkTok(temp);
-            strncpy(issuingAgency, temp, strlen(temp));
-            issuingAgency[strlen(temp)] = '\0';
-
+            strcpy(issuingAgency, temp);
+        
             ok = addTicket(p, issuingAgency, infractionId, plate);
-            if(!ok) {
-                fprintf(stderr, "Error addInfraction\n");
+            if(!ok){
+                fprintf(stderr, "Error adding to Ticket\n");
                 exit(errno);
-            }
         }
-    } else { //the file belongs to ticketsCHI
-
-        *city = IS_CHI;
+    }
+    } else{
         char plateRedacted[MAX_PLATE];
-        char unitDescription[MAX_AG];
+        char unitDescription[MAX_AGENCY];
         size_t infractionCode;
 
-        while(fgets(line, MAX_CHARS, fileTickets)!= NULL){
-            //Ignore this temp because the issueDate is not needed
-            temp = strtok(NULL, DELIM);
+        while(fgets(text, MAX_CHARS, fileTickets) != NULL){
+            temp = strtok(text, DELIM);
             checkTok(temp);
-            strncpy(plateRedacted, temp, strlen(temp));
-            plateRedacted[strlen(temp)] = '\0';
 
             temp = strtok(NULL, DELIM);
             checkTok(temp);
-            strncpy(unitDescription, temp, strlen(temp));
-            unitDescription[strlen(temp)] = '\0';
+            strcpy(plateRedacted, temp);
 
-            temp = strtok(NULL, END_OF_LINE);
+            temp = strtok(NULL, DELIM);
+            checkTok(temp);
+            strcpy(unitDescription, temp);
+
+            temp = strtok(NULL, DELIM);
             checkTok(temp);
             infractionCode = atoi(temp);
-
             ok = addTicket(p, unitDescription, infractionCode, plateRedacted);
-            if(!ok) {
-                fprintf(stderr, "Error addInfraction\n");
+            if(!ok){
+                fprintf(stderr, "Error adding to Ticket\n");
                 exit(errno);
             }
         }
     }
+    printf("TERMINE");
 }
+
 
 void query1(parkingTicketsADT p){
     FILE * query1File = fopen("query1.csv", "wt");
