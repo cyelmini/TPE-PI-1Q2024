@@ -47,7 +47,7 @@ void query3(parkingTicketsADT p);
 
 int main(int argc, char * argv[]){
 
-    if (argc != 2){
+    if(argc != 3){
         fprintf(stderr, "Invalid amount of arguments\n");
         exit(ERROR_ARG);
     }
