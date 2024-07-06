@@ -13,12 +13,12 @@
 /*  Reads the .csv file for tickets and extracts the plate, infractionId,
 * fineAmount and the issuingAgency. Then updates de ADT with the file data
 */
-void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city);
+void readTickets(FILE * fileTickets, parkingTicketsADT p, int * city);
 
 /* Reads the.csv file for infractions and extracts the id and the description of
 * the infraction. Then updates de ADT with the file data
 */
-void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction);
+void readInfractions(FILE * fileInfractions, parkingTicketsADT p);
 
 // Checks that the function strtok returns a valid argument
 void checkTok(char * temp);
@@ -61,19 +61,19 @@ int main(int argc, char * argv[]){
     }
 
     int city;
-    parkingTicketsADT infraction = newParking();
+    parkingTicketsADT p = newParking();
 
-    readInfractions(fileInfractions, infraction);
-    readTickets(fileTickets, infraction, &city);
+    readInfractions(fileInfractions, p);
+    readTickets(fileTickets, p, &city);
     
     fclose(fileTickets);
     fclose(fileInfractions);
 
-    query1(infraction);
-    query2(infraction);
-    query3(infraction);
+    query1(p);
+    query2(p);
+    query3(p);
 
-    freeParkingTickets(infraction);
+    freeParkingTickets(p);
 }
 
 void checkTok(char * temp){
@@ -83,7 +83,8 @@ void checkTok(char * temp){
     }
 }
 
-void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction) {
+/* Esta funcion parece andar bien???? */
+void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
     char line[MAX_CHARS];
     char * temp;
     int ok;
@@ -96,6 +97,7 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction) {
     size_t id;
     char description[MAX_DESC];
     while(fgets(line, MAX_CHARS, fileInfractions) != NULL){
+        printf("Entre al while\n");
         temp = strtok(line, DELIM);
         checkTok(temp);
         id = atoi(temp);
@@ -105,15 +107,16 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT infraction) {
         strncpy(description, temp, strlen(temp));
         description[strlen(temp)] = '\0';
 
-        ok = addInfraction(infraction, id, description);
-        if(ok == 0) {
+        ok = addInfraction(p, id, description);
+        if(!ok) {
             fprintf(stderr, "Error addInfraction\n");
             exit(errno);
         }
     }
+    printf("Sali del while\n");
 }
 
-void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city) {
+void readTickets(FILE * fileTickets, parkingTicketsADT p, int * city) {
     char line[MAX_CHARS];
     char * temp;
 
@@ -124,6 +127,7 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city) {
 
     temp = strtok(line, DELIM);
     int ok;
+
     //Based on the first parameter, it decides whether it is NYC or CHI
     if(strcmp(temp, "plate") == IS_NYC){
         *city = IS_NYC;
@@ -150,13 +154,14 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city) {
             strncpy(issuingAgency, temp, strlen(temp));
             issuingAgency[strlen(temp)] = '\0';
 
-            ok = addTicket(infraction, issuingAgency, infractionId, plate);
-            if(ok == 0) {
+            ok = addTicket(p, issuingAgency, infractionId, plate);
+            if(!ok) {
                 fprintf(stderr, "Error addInfraction\n");
                 exit(errno);
             }
         }
     } else { //the file belongs to ticketsCHI
+
         *city = IS_CHI;
         char plateRedacted[MAX_PLATE];
         char unitDescription[MAX_AG];
@@ -178,8 +183,8 @@ void readTickets(FILE * fileTickets, parkingTicketsADT infraction, int * city) {
             checkTok(temp);
             infractionCode = atoi(temp);
 
-            ok = addTicket(infraction, unitDescription, infractionCode, plateRedacted);
-            if(ok == 0) {
+            ok = addTicket(p, unitDescription, infractionCode, plateRedacted);
+            if(!ok) {
                 fprintf(stderr, "Error addInfraction\n");
                 exit(errno);
             }
