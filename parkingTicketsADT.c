@@ -73,27 +73,20 @@ parkingTicketsADT newParking(void) {
 int addInfraction(parkingTicketsADT p, size_t infractionId, const char* description) {
     int ret = 1;
     if (infractionId >= p->dimIdReference) {
-        char **temp = realloc(p->idReference, (infractionId + 1) * sizeof(char *));
+        char ** temp = realloc(p->idReference, (infractionId + 1) * sizeof(char *));
         if (temp == NULL) {
             errno = ERROR_MEM;
-            ret = 0;
-            return ret;
-        } else {
-            p->idReference = temp;
-            for (size_t i = p->dimIdReference; i <= infractionId; i++) {
-                p->idReference[i] = NULL;
-            }
-            p->dimIdReference = infractionId + 1;
-            p->idReference[infractionId] = malloc((MAX_DESC + 1) * sizeof(char));
-            if (p->idReference[infractionId] == NULL) {
-                errno = ERROR_MEM;
-                return 0;
-            }
-            strcpy(p->idReference[infractionId], description);
+            return 0;
         }
-    } else if (p->idReference[infractionId] == NULL) {
-        p->idReference[infractionId] = malloc((MAX_DESC + 1) * sizeof(char));
-        if (p->idReference[infractionId] == NULL) {
+        p->idReference = temp;
+        for (size_t i = p->dimIdReference; i <= infractionId; i++) {
+            p->idReference[i] = NULL;
+        }
+        p->dimIdReference = infractionId + 1;
+    }
+    if (p->idReference[infractionId] == NULL) {
+        p->idReference[infractionId] = malloc(MAX_DESC*sizeof(char));
+        if(p->idReference[infractionId] == NULL) {
             errno = ERROR_MEM;
             return 0;
         }
