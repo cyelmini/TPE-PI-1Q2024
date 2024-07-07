@@ -1,7 +1,6 @@
 #include "parkingTicketsADT.h"
 #include <errno.h>
 #include <strings.h>
-#include <stdio.h>
 
 typedef struct nodePlate{
     char plate[MAX_PLATE];
@@ -52,7 +51,7 @@ struct parkingTicketsCDT{
     TListInfCount iterCount;
     TListInfAlpha firstAlpha; //Pointer to the first element of the list of infractions ordered alphabetically
     TListInfAlpha iterAlpha;
-    char** idReference;   //Vector where the position corresponds with the infractionId
+    char **idReference;   //Vector where the position corresponds with the infractionId
     size_t dimIdReference; //Dimension of the vector
 };
 
@@ -60,7 +59,7 @@ parkingTicketsADT newParking(void) {
     errno = OK;
     parkingTicketsADT aux = calloc(1, sizeof(struct parkingTicketsCDT));
 
-    if (aux == NULL) {
+    if (aux == NULL || errno == ENOMEM) {
         errno = ERROR_MEM;
         return NULL;
     }
@@ -68,10 +67,9 @@ parkingTicketsADT newParking(void) {
 }
 
 int addInfraction(parkingTicketsADT p, size_t infractionId, const char* description) {
-    int ret = 1;
-    if (infractionId >= p->dimIdReference) {
+    if(infractionId >= p->dimIdReference) {
         char ** temp = realloc(p->idReference, (infractionId + 1) * sizeof(char *));
-        if (temp == NULL) {
+        if (temp == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return 0;
         }
@@ -83,20 +81,21 @@ int addInfraction(parkingTicketsADT p, size_t infractionId, const char* descript
     }
     if (p->idReference[infractionId] == NULL) {
         p->idReference[infractionId] = malloc(MAX_DESC*sizeof(char));
-        if(p->idReference[infractionId] == NULL) {
+        if(p->idReference[infractionId] == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return 0;
         }
         strcpy(p->idReference[infractionId], description);
     }
-    return ret;
+    return 1;
 }
 
-static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCount, const char **samePlate) {
+static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCount, const char **samePlate){
+    errno = OK;
     int c;
     if (list == NULL || (c = strcasecmp(list->plate, plate)) > 0) {
-        TListPlate newPlate = malloc(sizeof(TNodePlate));
-        if (newPlate == NULL) {
+        TListPlate newPlate = malloc(sizeof(struct nodePlate));
+        if (newPlate == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return list;
         }
@@ -105,15 +104,15 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
         *newCount = newPlate->count;
         newPlate->tail = list;
         return newPlate;
-    }
-    if (c == 0) {
+    } else if (c == 0) {
         list->count++;
         *newCount = list->count;
         *samePlate = list->plate;
         return list;
+    } else {
+        list->tail = addPlateRec(list->tail, plate, newCount, samePlate);
+        return list;
     }
-    list->tail = addPlateRec(list->tail, plate, newCount, samePlate);
-    return list;
 }
 
 void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char *samePlate, const char *plate) {
@@ -144,7 +143,7 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
     // If the required size is greater than the current size, resize the infraction vector
     if (newSize > list->size) {
         TInfraction *temp = realloc(list->infractions, newSize * sizeof(TInfraction));
-        if (temp == NULL) {
+        if (temp == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return;
         }
@@ -183,7 +182,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
     int c;
     if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not exist
         TListAg newAg = calloc(1, sizeof(TNodeAg));
-        if (newAg == NULL) {
+        if (newAg == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return list;
         }
@@ -215,7 +214,7 @@ int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, cons
 static TListInfCount sortByCountRec(TListInfCount list, const char * infractionDesc, size_t count){
     if(list == NULL || (list->count < count)){
         TListInfCount newInfCount = malloc(sizeof(TNodeInfCount));
-        if (newInfCount == NULL) {
+        if (newInfCount == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return list;
         }
@@ -238,7 +237,7 @@ static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc
     int c;
     if (list == NULL || (c = strcasecmp(list->description, infractionDesc)) > 0) {
         TListInfAlpha newInfAlpha = malloc(sizeof(TNodeInfAlpha));
-        if (newInfAlpha == NULL) {
+        if (newInfAlpha == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return list;
         }

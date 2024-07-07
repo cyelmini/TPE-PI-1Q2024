@@ -75,13 +75,6 @@ int main(int argc, char * argv[]){
     freeParkingTickets(p);
 }
 
-void checkTok(char * temp){
-    if(temp == NULL){
-            fprintf(stderr, "Token error\n");
-            exit(ERROR_TOK);
-    }
-}
-
 void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
     char line[MAX_CHARS];
     char * temp;
@@ -100,9 +93,8 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
         id = atoi(temp);
 
         temp = strtok(NULL, DELIM);
-        checkTok(temp);
-        strncpy(description, temp, strlen(temp));
-        description[strlen(temp)] = '\0';
+
+        strcpy(description, temp);
 
         ok = addInfraction(p, id, description);
         if(!ok) {
@@ -115,7 +107,10 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
 void readTickets(FILE * fileTickets, parkingTicketsADT p) {
     char text[MAX_CHARS];
 
-    fscanf(fileTickets, "%s\n", text);
+    if(fscanf(fileTickets, "%s\n", text) != 1){
+        fprintf(stderr, "Error reading first line\n");
+        exit(ERROR_READ);
+    }
     char * temp;
     int ok;
 
@@ -128,54 +123,56 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
             temp = strtok(text, DELIM);
             checkTok(temp);
             strcpy(plate, temp);
-        
 
+            //issuePlate is not a value needed for the queries
             temp = strtok(NULL, DELIM);
-            checkTok(temp);
+            
+            temp = strtok(NULL, DELIM);
 
-            temp = strtok(NULL, DELIM);
-            checkTok(temp);
             infractionId = atoi(temp);
-        
 
+            //fineAmount is not a value needed for the queries
             temp = strtok(NULL, DELIM);
-            checkTok(temp);
+
 
             temp = strtok(NULL, END_OF_LINE);
-            checkTok(temp);
+
             strcpy(issuingAgency, temp);
-        
+
             ok = addTicket(p, issuingAgency, infractionId, plate);
             if(!ok){
                 fprintf(stderr, "Error adding to Ticket\n");
                 exit(errno);
             }
         }
-    } else{
+    } else {
         char plateRedacted[MAX_PLATE];
         char unitDescription[MAX_AGENCY];
         size_t infractionCode;
 
         while(fgets(text, MAX_CHARS, fileTickets) != NULL){
+            //issueDate is not a value needed for the queries
             temp = strtok(text, DELIM);
             checkTok(temp);
 
             temp = strtok(NULL, DELIM);
-            checkTok(temp);
+
             strcpy(plateRedacted, temp);
 
             temp = strtok(NULL, DELIM);
-            checkTok(temp);
+
             strcpy(unitDescription, temp);
 
             temp = strtok(NULL, DELIM);
-            checkTok(temp);
+
             infractionCode = atoi(temp);
             ok = addTicket(p, unitDescription, infractionCode, plateRedacted);
             if(!ok){
                 fprintf(stderr, "Error adding to Ticket\n");
                 exit(errno);
             }
+            //fineLevel1Amount is not needed for the queries,
+            //therefore it skips the line completly
         }
     }
 }
