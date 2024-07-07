@@ -3,7 +3,7 @@
 #include "htmlTable.h"
 #include "parkingTicketsADT.h"
 
-#define MAX_CHARS 80 // Each line of file can have up to 80 chars
+#define MAX_CHARS 80
 #define MAX_AGENCY 37
 #define DELIM ";"
 #define END_OF_LINE "\n"
@@ -95,6 +95,9 @@ void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
     size_t id;
     char description[MAX_DESC];
     while(fgets(line, MAX_CHARS, fileInfractions) != NULL){
+
+        line[strcspn(line, "\n")] = '\0';
+
         temp = strtok(line, DELIM);
         checkTok(temp);
         id = atoi(temp);
@@ -127,6 +130,7 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
         size_t infractionId;
 
         while(fgets(text, MAX_CHARS, fileTickets) != NULL){
+
             temp = strtok(text, DELIM);
             checkTok(temp);
             strcpy(plate, temp);
@@ -140,7 +144,6 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
 
             //fineAmount is not a value needed for the queries
             temp = strtok(NULL, DELIM);
-
 
             temp = strtok(NULL, END_OF_LINE);
 
@@ -185,7 +188,6 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
 }
 
 void query1(parkingTicketsADT p){
-
     FILE * query1File = fopen("query1.csv", "wt");
     htmlTable table1 = newTable("query1.html", 2, "infraction", "tickets");
 
@@ -230,10 +232,9 @@ void query2(parkingTicketsADT p){
         exit(ERROR_OPEN);
     }
 
-    char infraction[MAX_DESC];
-
     fputs("issuingAgency;infraction;tickets\n", query2File);
 
+    char infraction[MAX_DESC];
     toBeginAg(p);
     if(errno != OK){
         fprintf(stderr, "Error in toBeginAg\n");
@@ -267,8 +268,9 @@ void query3(parkingTicketsADT p){
         exit(ERROR_OPEN);
     }
 
-    char infraction[MAX_DESC];
+    fputs("infraction;plate;tickets\n", query3File);
 
+    char infraction[MAX_DESC];
     toBeginAlpha(p);
     if(errno != OK){
         fprintf(stderr, "Error in toBeginAlpha\n");
@@ -283,6 +285,7 @@ void query3(parkingTicketsADT p){
         char * maxPlate;
         size_t infractionCount;
         char * infractionName = nextAlpha(p, &maxPlate, &infractionCount);
+
         if(infractionName != NULL) {
             fprintf(query3File, "%s;%s;%ld\n", infractionName, maxPlate, infractionCount);
             snprintf(infraction, MAX_DESC, "%ld", infractionCount);
@@ -292,4 +295,5 @@ void query3(parkingTicketsADT p){
     fclose(query3File);
     closeHTMLTable(table3);
 }
+
 
