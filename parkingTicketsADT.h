@@ -3,9 +3,7 @@
 
 #include <stdlib.h>
 
-/* The values exceed the maximum values provided
-* by a little just in case
-*/
+/* These values exceed the maximum values provided by a little */
 #define MAX_PLATE 15
 #define MAX_DESC 55
 #define MAX_AG 40
@@ -28,6 +26,9 @@ int addInfraction(parkingTicketsADT adt,size_t infractionId,const char* descript
 * and 0 if not.
 */
 int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate);
+
+/* Frees the memory reserved by the ADT */
+void freeParkingTickets(parkingTicketsADT p);
 
 /* ----------------- Functions to iterate over the three main lists meant to resolve the queries----------------------*/
 
@@ -76,8 +77,7 @@ int hasNextAlpha(parkingTicketsADT p);
 */
 char * nextAlpha(parkingTicketsADT p, char ** maxPlate, size_t * infractionCount);
 
-/* Frees the memory reserved by the ADT */
-void freeParkingTickets(parkingTicketsADT p);
+/*--------------------------------------------------------------------------------------------------------------------*/
 
 enum {OK = 0, ERROR_MEM, ERROR_TOK, ERROR_ARG, ERROR_OPEN, NEXT_ERROR, ERROR_READ};
 
