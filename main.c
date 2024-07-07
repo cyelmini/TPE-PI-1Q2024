@@ -7,6 +7,7 @@
 #define MAX_AGENCY 37
 #define DELIM ";"
 #define END_OF_LINE "\n"
+#define MAX_COUNT 11
 #define HEADER "plate;issueDate;infractionId;fineAmount;issuingAgency"
 
 /*  Reads the .csv file for tickets and extracts the plate, infractionId,
@@ -192,19 +193,27 @@ void query1(parkingTicketsADT p){
         exit(ERROR_OPEN);
     }
 
-    char infraction[MAX_DESC];
-
     fputs("infraction;tickets\n", query1File);
 
     toBeginCount(p);
+    if (errno != 0) {
+        fprintf(stderr, 'Error toBeginCount\n');
+        exit(errno);
+    }
+    
+    char count[MAX_COUNT];
+
     while(hasNextCount(p)){
+        if (errno != 0) {
+            fprintf(stderr, 'Error hasNextCount\n');
+            exit(errno);
+        }
         size_t infractionCount;
         char * infractionName = nextCount(p, &infractionCount);
-        if(infractionName != NULL) {
+
             fprintf(query1File, "%s;%zu\n", infractionName, infractionCount);
-            snprintf(infraction, MAX_DESC, "%zu", infractionCount);
-            addHTMLRow(table1, infractionName, infraction);
-        }
+            sprintf(count, "%zu", infractionCount);
+            addHTMLRow(table1, infractionName, count);
     }
     fclose(query1File);
     closeHTMLTable(table1);
