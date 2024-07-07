@@ -187,7 +187,7 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
 void query1(parkingTicketsADT p){
 
     FILE * query1File = fopen("query1.csv", "wt");
-    htmlTable table1 = newTable("query1.html", 2, "infraction", "Tickets");
+    htmlTable table1 = newTable("query1.html", 2, "infraction", "tickets");
 
     if(query1File == NULL || table1 == NULL){
         fprintf(stderr, "Error in file generation\n");
@@ -197,15 +197,14 @@ void query1(parkingTicketsADT p){
     fputs("infraction;tickets\n", query1File);
 
     toBeginCount(p);
-    if (errno != 0) {
-        fprintf(stderr, "Error toBeginCount\n");
+    if (errno != OK) {
+        fprintf(stderr, "Error in toBeginCount\n");
         exit(errno);
     }
 
     char count[MAX_COUNT];
-
     while(hasNextCount(p)){
-        if (errno != 0) {
+        if (errno != OK) {
             fprintf(stderr, "Error hasNextCount\n");
             exit(errno);
         }
@@ -213,8 +212,8 @@ void query1(parkingTicketsADT p){
         char * infractionName = nextCount(p, &infractionCount);
 
         if(infractionName != NULL){
-            fprintf(query1File, "%s;%zu\n", infractionName, infractionCount);
-            snprintf(count, MAX_COUNT, "%zu", infractionCount);
+            fprintf(query1File, "%s;%ld\n", infractionName, infractionCount);
+            snprintf(count, MAX_COUNT, "%ld", infractionCount);
             addHTMLRow(table1, infractionName, count);
         }
     }
@@ -236,13 +235,22 @@ void query2(parkingTicketsADT p){
     fputs("issuingAgency;infraction;tickets\n", query2File);
 
     toBeginAg(p);
+    if(errno != OK){
+        fprintf(stderr, "Error in toBeginAg\n");
+        exit(errno);
+    }
+
     while(hasNextAg(p)) {
+        if(errno != OK){
+            fprintf(stderr, "Error in hasNextCount\n");
+            exit(errno);
+        }
         char * mostPopularInf;
         size_t infractionCount;
         char * agency = nextAg(p, &mostPopularInf, &infractionCount);
         if(agency != NULL) {
-            fprintf(query2File, "%s;%s;%zu\n", agency, mostPopularInf, infractionCount);
-            snprintf(infraction, MAX_DESC, "%zu", infractionCount);
+            fprintf(query2File, "%s;%s;%ld\n", agency, mostPopularInf, infractionCount);
+            snprintf(infraction, MAX_DESC, "%ld", infractionCount);
             addHTMLRow(table2, agency, mostPopularInf, infraction);
         }
     }
@@ -262,13 +270,22 @@ void query3(parkingTicketsADT p){
     char infraction[MAX_DESC];
 
     toBeginAlpha(p);
+    if(errno != OK){
+        fprintf(stderr, "Error in toBeginAlpha\n");
+        exit(errno);
+    }
+
     while(hasNextAlpha(p)){
+        if(errno != OK){
+            fprintf(stderr, "Error in hasNextAlpha\n");
+            exit(errno);
+        }
         char * maxPlate;
         size_t infractionCount;
         char * infractionName = nextAlpha(p, &maxPlate, &infractionCount);
         if(infractionName != NULL) {
-            fprintf(query3File, "%s;%s;%zu\n", infractionName, maxPlate, infractionCount);
-            snprintf(infraction, MAX_DESC, "%zu", infractionCount);
+            fprintf(query3File, "%s;%s;%ld\n", infractionName, maxPlate, infractionCount);
+            snprintf(infraction, MAX_DESC, "%ld", infractionCount);
             addHTMLRow(table3, infractionName, maxPlate, infraction);
         }
     }
