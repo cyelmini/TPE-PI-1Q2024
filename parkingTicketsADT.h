@@ -29,11 +29,6 @@ int addInfraction(parkingTicketsADT adt,size_t infractionId,const char* descript
 */
 int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate);
 
-/* Generates two lists of infractions that are sorted by
-* infraction count (to be used in query 1) and alphabetically (to be used in query 3).
-*/
-void sortList(parkingTicketsADT p);
-
 /* ----------------- Functions to iterate over the three main lists meant to resolve the queries----------------------*/
 
 /* To iterate over the lists of agencies, sets iterator on
