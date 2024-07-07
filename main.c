@@ -209,9 +209,11 @@ void query1(parkingTicketsADT p){
         size_t infractionCount;
         char * infractionName = nextCount(p, &infractionCount);
 
-        fprintf(query1File, "%s;%zu\n", infractionName, infractionCount);
-        snprintf(count, MAX_COUNT, "%zu", infractionCount);
-        addHTMLRow(table1, infractionName, count);
+        if(infractionName != NULL){
+            fprintf(query1File, "%s;%zu\n", infractionName, infractionCount);
+            snprintf(count, MAX_COUNT, "%zu", infractionCount);
+            addHTMLRow(table1, infractionName, count);
+        }
     }
     fclose(query1File);
     closeHTMLTable(table1);
