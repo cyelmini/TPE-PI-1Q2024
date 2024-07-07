@@ -75,6 +75,13 @@ int main(int argc, char * argv[]){
     freeParkingTickets(p);
 }
 
+void checkTok(char * temp){
+    if(temp == NULL){
+        fprintf(stderr, "Token error\n");
+        exit(ERROR_TOK);
+    }
+}
+
 void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
     char line[MAX_CHARS];
     char * temp;
@@ -126,7 +133,7 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
 
             //issuePlate is not a value needed for the queries
             temp = strtok(NULL, DELIM);
-            
+
             temp = strtok(NULL, DELIM);
 
             infractionId = atoi(temp);
