@@ -104,15 +104,14 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
         *newCount = newPlate->count;
         newPlate->tail = list;
         return newPlate;
-    } else if (c == 0) {
+    }
+    if (c == 0) {
         list->count++;
         *newCount = list->count;
         *samePlate = list->plate;
         return list;
-    } else {
-        list->tail = addPlateRec(list->tail, plate, newCount, samePlate);
-        return list;
     }
+    return addPlateRec(list->tail, plate, newCount, samePlate);
 }
 
 void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char *samePlate, const char *plate) {
@@ -182,7 +181,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
     int c;
     if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not exist
         TListAg newAg = calloc(1, sizeof(TNodeAg));
-        if (newAg == NULL || errno == ENOMEM) {
+        if(newAg == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return list;
         }
@@ -192,7 +191,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
         *flag = 1;
         return newAg;
     }
-    if (c == 0) {
+    if(c == 0) {
         addTicketAux(list, infractionDesc, infractionId, plate);
         *flag = 1;
         return list;
