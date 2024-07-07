@@ -227,11 +227,20 @@ static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc
     return list;
 }
 
-void sortList(parkingTicketsADT p) {
+static void sortListCount(parkingTicketsADT p) {
     TListAg aux = p->firstAgency;
     while (aux != NULL) {
         for (size_t i = 0; i < aux->size; i++) {
             p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].totalCount);
+        }
+        aux = aux->tail;
+    }
+}
+
+static void sortListAlpha(parkingTicketsADT p){
+    TListAg aux = p->firstAgency;
+    while (aux != NULL) {
+        for (size_t i = 0; i < aux->size; i++) {
             p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate);
         }
         aux = aux->tail;
@@ -267,6 +276,7 @@ void toBeginCount(parkingTicketsADT p){
     if(p == NULL){
         errno = ERROR_ARG;
     }
+    sortListCount(p);
     p->iterCount = p->firstCount;
 }
 
@@ -291,6 +301,7 @@ void toBeginAlpha(parkingTicketsADT p){
     if(p == NULL){
         errno = ERROR_ARG;
     }
+    sortListAlpha(p);
     p->iterAlpha = p->firstAlpha;
 }
 
