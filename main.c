@@ -82,7 +82,6 @@ void checkTok(char * temp){
     }
 }
 
-/* Esta funcion parece andar bien???? */
 void readInfractions(FILE * fileInfractions, parkingTicketsADT p) {
     char line[MAX_CHARS];
     char * temp;

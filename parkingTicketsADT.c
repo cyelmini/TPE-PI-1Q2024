@@ -1,6 +1,7 @@
 #include "parkingTicketsADT.h"
 #include <errno.h>
 #include <strings.h>
+#include <stdio.h>
 
 typedef struct nodePlate{
     char plate[MAX_PLATE];
@@ -142,9 +143,12 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
     list->infractions[infractionId].totalCount++; //Register a new apparition
 
     //If it was not the first time then we only have to add the plate that did it
-    size_t newCount;
+    size_t newCount = 0;
     list->infractions[infractionId].firstPlate = addPlateRec(list->infractions[infractionId].firstPlate, plate, &newCount);
     if(newCount > list->infractions[infractionId].maxPlateCount){ //Update the plate that committed the infraction the most
+
+        //falta desempate alfabetico
+
         list->infractions[infractionId].maxPlateCount = newCount;
         strcpy(list->infractions[infractionId].plate, plate);
     }
