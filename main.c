@@ -181,8 +181,8 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
     }
 }
 
-
 void query1(parkingTicketsADT p){
+
     FILE * query1File = fopen("query1.csv", "wt");
     htmlTable table1 = newTable("query1.html", 2, "infraction", "Tickets");
 
@@ -195,23 +195,23 @@ void query1(parkingTicketsADT p){
 
     toBeginCount(p);
     if (errno != 0) {
-        fprintf(stderr, 'Error toBeginCount\n');
+        fprintf(stderr, "Error toBeginCount\n");
         exit(errno);
     }
-    
+
     char count[MAX_COUNT];
 
     while(hasNextCount(p)){
         if (errno != 0) {
-            fprintf(stderr, 'Error hasNextCount\n');
+            fprintf(stderr, "Error hasNextCount\n");
             exit(errno);
         }
         size_t infractionCount;
         char * infractionName = nextCount(p, &infractionCount);
 
-            fprintf(query1File, "%s;%zu\n", infractionName, infractionCount);
-            sprintf(count, "%zu", infractionCount);
-            addHTMLRow(table1, infractionName, count);
+        fprintf(query1File, "%s;%zu\n", infractionName, infractionCount);
+        snprintf(count, MAX_COUNT, "%zu", infractionCount);
+        addHTMLRow(table1, infractionName, count);
     }
     fclose(query1File);
     closeHTMLTable(table1);
