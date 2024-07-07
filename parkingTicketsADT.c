@@ -147,14 +147,19 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
     list->infractions[infractionId].firstPlate = addPlateRec(list->infractions[infractionId].firstPlate, plate, &newCount);
     if(newCount > list->infractions[infractionId].maxPlateCount){ //Update the plate that committed the infraction the most
 
-        //falta desempate alfabetico
+        /* FALTA DESEMPATE ALFABETICO: "En caso de que existan dos o más patentes con la misma cantidad de multas para
+         * la misma infracción considerar la menor patente en orden alfabético." */
 
         list->infractions[infractionId].maxPlateCount = newCount;
         strcpy(list->infractions[infractionId].plate, plate);
     }
 
     if(list->infractions[infractionId].totalCount > list->infractions[list->maxPosInfraction].totalCount) { //Update the most popular infraction by agency
-        list->maxPosInfraction = infractionId;
+
+        /* FALTA DESEMPATE ALFABETICO: "En caso de que existan dos o más infracciones con la misma cantidad de multas para la
+         * misma agencia emisora considerar la menor infracción en orden alfabético. */
+
+                list->maxPosInfraction = infractionId;
     }
 }
 
@@ -191,6 +196,8 @@ int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, cons
     return flag;
 }
 
+/* REVISAR: "La información debe listarse ordenada en forma descendente por la cantidad
+ * total de multas y a igualdad en la cantidad de multas desempatar alfabéticamente por nombre de la infracción. */
 static TListInfCount sortByCountRec(TListInfCount list, const char * infractionDesc, size_t count){
     if(list == NULL || (list->count > count)){
         TListInfCount newInfCount = malloc(sizeof(TNodeInfCount));
@@ -203,7 +210,7 @@ static TListInfCount sortByCountRec(TListInfCount list, const char * infractionD
         newInfCount->tail = list;
         return newInfCount;
     }
-    if(list->count == count){
+    if(list->count == count){  /* DEBERIA COMPARAR ACA LAS DESCRIPCIONES ????? REVISAR !!!!!!!!!! */
         return list;
     }
     list->tail = sortByCountRec(list->tail, infractionDesc, count);
