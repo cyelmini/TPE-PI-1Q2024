@@ -114,7 +114,7 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
     return addPlateRec(list->tail, plate, newCount, samePlate);
 }
 
-void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char *samePlate, const char *plate) {
+static void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char *samePlate, const char *plate) {
     if (list->infractions[infractionId].maxPlateCount < newCount) {
         list->infractions[infractionId].maxPlateCount = newCount;
         strcpy(list->infractions[infractionId].plate, plate);
@@ -126,7 +126,7 @@ void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char 
     }
 }
 
-void updateInfraction(TListAg list, size_t infractionId) {
+static void updateInfraction(TListAg list, size_t infractionId) {
     if (list->infractions[list->maxPosInfraction].totalCount < list->infractions[infractionId].totalCount) {
         list->maxPosInfraction = infractionId;
     }
