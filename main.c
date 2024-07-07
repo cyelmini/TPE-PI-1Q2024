@@ -59,7 +59,6 @@ int main(int argc, char * argv[]){
         exit(ERROR_OPEN);
     }
 
-
     parkingTicketsADT p = newParking();
 
     readInfractions(fileInfractions, p);
@@ -150,8 +149,8 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
             if(!ok){
                 fprintf(stderr, "Error adding to Ticket\n");
                 exit(errno);
+            }
         }
-    }
     } else{
         char plateRedacted[MAX_PLATE];
         char unitDescription[MAX_AGENCY];
@@ -179,7 +178,6 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
             }
         }
     }
-    printf("TERMINE");
 }
 
 
