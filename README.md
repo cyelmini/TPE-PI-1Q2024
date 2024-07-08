@@ -4,13 +4,13 @@
 
 # Project Authors
 
-Name and surname: Catalina Yelmin
+Name: Catalina Yelmin
 legajo:64133
 
-Name and surname: Fancisco Trivelloni
+Name: Fancisco Trivelloni
 legajo:64141
 
-Name and surname: Lorenzo Pizzuto Beltrán
+Name: Lorenzo Pizzuto Beltrán
 legajo: 64123
 
 # List of source and header files, with a brief explanation of each one
