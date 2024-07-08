@@ -353,67 +353,63 @@ char * nextAlpha(parkingTicketsADT p, char ** maxPlate, size_t * infractionCount
     return NULL;
 }
 
-static void freeListAlphaRec(TListInfAlpha list){
+static void freeIdReference(char ** idReference, size_t dimIdReference){
+    for(size_t i = 0; i < dimIdReference; i++){
+        if(idReference[i] != NULL){
+            free(idReference[i]);
+        }
+    }
+}
+
+static void freeListAlpha(TListInfAlpha list){
     if(list == NULL){
         return;
     }
-    TListInfAlpha aux = list;
-    list = list->tail;
-    free(aux);
-    freeListAlphaRec(list);
+    TListInfAlpha aux = list->tail;
+    free(list);
+    freeListAlpha(aux);
 }
 
-static void freeListCountRec(TListInfCount list){
+static void freeListCount(TListInfCount list){
     if(list == NULL){
         return;
     }
-    TListInfCount aux = list;
-    list = list->tail;
-    free(aux);
-    freeListCountRec(list);
+    TListInfCount aux = list->tail;
+    free(list);
+    freeListCount(aux);
 }
 
-static void freePlateRec(TListPlate list){
+static void freePlate(TListPlate list){
     if(list == NULL){
         return;
     }
-    TListPlate aux = list;
-    list = list->tail;
-    free(aux);
-    freePlateRec(list);
+    TListPlate aux = list->tail;
+    free(list);
+    freePlate(aux);
 }
 
-static void freeInfraction(TInfraction * infractions, int size){
-    for(int i = 0; i < size; i++){
-        freePlateRec(infractions[i].firstPlate);
+static void freeInfraction(TInfraction * infraction, size_t size){
+    for(size_t i = 0; i < size; i++){
+        freePlate(infraction[i].firstPlate);
     }
 }
 
-static void freeListAgRec(TListAg list){
+static void freeAgency(TListAg list){
     if(list == NULL){
         return;
     }
     freeInfraction(list->infractions, list->size);
     free(list->infractions);
-    TListAg aux = list;
-    list = list->tail;
-    free(aux);
-    freeListAgRec(list);
-}
-
-void freeVecReference(parkingTicketsADT p) {
-    for (size_t i = 0; i < p->dimIdReference; i++) {
-        if (p->idReference[i] != NULL) {
-            free(p->idReference[i]);
-        }
-    }
-    free(p->idReference);
+    TListAg aux = list->tail;
+    free(list);
+    freeAgency(aux);
 }
 
 void freeParkingTickets(parkingTicketsADT p){
-    freeListAgRec(p->firstAgency);
-    freeListCountRec(p->firstCount);
-    freeListAlphaRec(p->firstAlpha);
-    freeVecReference(p);
+    freeAgency(p->firstAgency);
+    freeListCount(p->firstCount);
+    freeListAlpha(p->firstAlpha);
+    freeIdReference(p->idReference, p->dimIdReference);
+    free(p->idReference);
     free(p);
 }
