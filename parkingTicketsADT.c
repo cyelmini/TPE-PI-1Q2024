@@ -112,7 +112,8 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
         *samePlate = list->plate;
         return list;
     }
-    return addPlateRec(list->tail, plate, newCount, samePlate);
+    list->tail = addPlateRec(list->tail, plate, newCount, samePlate);
+    return list;
 }
 
 static void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char *samePlate, const char *plate) {
