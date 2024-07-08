@@ -1,31 +1,38 @@
+
 # TPE-PI-1Q2024
--Fecha final xx/xx/xxxx
+- Final date: 08/07/2024
 
-# autores del proyecto
+# Project Authors
 
-Nombre y apellido: Lorenzo Pizzuto beltran
+Name and surname: Catalina Yelmin
+legajo:64133
+
+Name and surname: Fancisco Trivelloni
+legajo:64141
+
+Name and surname: Lorenzo Pizzuto Beltrán
 legajo: 64123
 
-Nombre y apellido:
-legajo:
+# List of source and header files, with a brief explanation of each one
 
-Nombre y apellido:
-legajo:
+- *parkingTickets.c*: Main source file containing the logic for processing parking tickets.
+- *parkingTicketsADT.c*: Source file that implements the ADT (Abstract Data Type) for handling parking tickets.
+- *parkingTicketsADT.h*: Header file for the parking tickets ADT.
+- *Makefile*: Configuration file for compiling the project.
 
-# lista de archivos fuente y de encabezado,cn breve explicacion de cada uno
+# Commands needed to compile the project
 
+- *all*: To compile the executables, run the command "make all" in the console. This will generate two executables:
+  - parkingTicketsNYC: Executable for processing New York City parking tickets.
+  - parkingTicketsCHI: Executable for processing Chicago parking tickets.
 
+- *clean*: To delete all generated files, run the command "make clean".
 
-# comandos necesarios para compilar el proyecto
-# generar ejecutables
-**All**
--si se desea compilar los jecutables, correr en la consola el comando "make all".El mismo generara XX ejecutables, correspodiendo a XX.
+# Clarification
 
-**delete**
--para borrar todos los archivos generados correr el comand "make claen".
--//podriamos gregar u make deleteQueries
+- The order of the files and the number of arguments must be as indicated above.
 
-**Aclaracion**
--El orden de los archivos y la cantidad de argumentos debe ser la indicada arriba.
+# Additional project information
 
-# Opcionamente informacion del proyecto
+- *Queries*: The generated query files (query1.csv, query2.csv, query3.csv) contain the results of the data processing.
+- *HTML*: The generated HTML files (query1.html, query2.html, query3.html) provide a visualization of the query results.
