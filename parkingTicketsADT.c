@@ -1,6 +1,7 @@
 #include "parkingTicketsADT.h"
 #include <errno.h>
 #include <strings.h>
+#include <string.h>
 
 typedef struct nodePlate{
     char plate[MAX_PLATE];
