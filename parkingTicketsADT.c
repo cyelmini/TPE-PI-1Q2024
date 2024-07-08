@@ -206,6 +206,10 @@ int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, cons
         errno = ERROR_ARG;
         return flag;
     }
+    if(infractionId >= p->dimIdReference || p->idReference[infractionId] == NULL){
+        flag = 1;
+        return flag;  // If one infraction is present in the infractions.csv but not in the tickets.csv, we skip it and don't do anything
+    }
     p->firstAgency = addTicketRec(p->firstAgency, agency, p->idReference[infractionId], infractionId, plate, &flag);
     return flag;
 }
@@ -223,7 +227,7 @@ static TListInfCount sortByCountRec(TListInfCount list, const char * infractionD
         return newInfCount;
     }
     if(list->count == count){
-        if(strcasecmp(list->description, infractionDesc) > 0){   //should copy the first description in alphabetical order
+        if(strcasecmp(list->description, infractionDesc) > 0){   //Should copy the first description in alphabetical order
             strcpy(list->description, infractionDesc);
         }
         return list;

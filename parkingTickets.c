@@ -151,7 +151,7 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
 
             ok = addTicket(p, issuingAgency, infractionId, plate);
             if(!ok){
-                fprintf(stderr, "Error adding to Ticket\n");
+                fprintf(stderr, "Error adding ticket\n");
                 exit(errno);
             }
         }
@@ -178,7 +178,7 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p) {
             infractionCode = atoi(temp);
             ok = addTicket(p, unitDescription, infractionCode, plateRedacted);
             if(!ok){
-                fprintf(stderr, "Error adding to Ticket\n");
+                fprintf(stderr, "Error adding ticket\n");
                 exit(errno);
             }
             //fineLevel1Amount is not needed for the queries,
