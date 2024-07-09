@@ -10,7 +10,8 @@
 #define MAX_COUNT 11
 #define HEADER "plate;issueDate;infractionId;fineAmount;issuingAgency"
 
-/*  Reads the .csv file for tickets and extracts the plate, infractionId,
+
+/* Reads the .csv file for tickets and extracts the plate, infractionId,
 * fineAmount and the issuingAgency. Then updates de ADT with the file data
 */
 void readTickets(FILE * fileTickets, parkingTicketsADT p);
@@ -20,8 +21,9 @@ void readTickets(FILE * fileTickets, parkingTicketsADT p);
 */
 void readInfractions(FILE * fileInfractions, parkingTicketsADT p);
 
-// Checks that the function strtok returns a valid argument
+/* Checks that the function strtok returns a valid argument */
 void checkTok(char * temp);
+
 
 /*------------------------------------------------ QUERIES -----------------------------------------------------------*/
 
@@ -44,6 +46,7 @@ void query2(parkingTicketsADT p);
 void query3(parkingTicketsADT p);
 
 /*--------------------------------------------------------------------------------------------------------------------*/
+
 
 int main(int argc, char * argv[]){
 
@@ -238,13 +241,13 @@ void query2(parkingTicketsADT p){
 
     fputs("issuingAgency;infraction;tickets\n", query2File);
 
-    char infraction[MAX_DESC];
     toBeginAg(p);
     if(errno != OK){
         fprintf(stderr, "Error in toBeginAg\n");
         exit(errno);
     }
 
+    char count[MAX_COUNT];
     while(hasNextAg(p)) {
         if(errno != OK){
             fprintf(stderr, "Error in hasNextCount\n");
@@ -255,8 +258,8 @@ void query2(parkingTicketsADT p){
         char * agency = nextAg(p, &mostPopularInf, &infractionCount);
         if(agency != NULL) {
             fprintf(query2File, "%s;%s;%ld\n", agency, mostPopularInf, infractionCount);
-            snprintf(infraction, MAX_DESC, "%ld", infractionCount);
-            addHTMLRow(table2, agency, mostPopularInf, infraction);
+            snprintf(count, MAX_COUNT, "%ld", infractionCount);
+            addHTMLRow(table2, agency, mostPopularInf, count);
         }
     }
     fclose(query2File);
@@ -274,13 +277,13 @@ void query3(parkingTicketsADT p){
 
     fputs("infraction;plate;tickets\n", query3File);
 
-    char infraction[MAX_DESC];
     toBeginAlpha(p);
     if(errno != OK){
         fprintf(stderr, "Error in toBeginAlpha\n");
         exit(errno);
     }
 
+    char count[MAX_COUNT];
     while(hasNextAlpha(p)){
         if(errno != OK){
             fprintf(stderr, "Error in hasNextAlpha\n");
@@ -292,8 +295,8 @@ void query3(parkingTicketsADT p){
 
         if(infractionName != NULL) {
             fprintf(query3File, "%s;%s;%ld\n", infractionName, maxPlate, infractionCount);
-            snprintf(infraction, MAX_DESC, "%ld", infractionCount);
-            addHTMLRow(table3, infractionName, maxPlate, infraction);
+            snprintf(count, MAX_COUNT, "%ld", infractionCount);
+            addHTMLRow(table3, infractionName, maxPlate, count);
         }
     }
     fclose(query3File);
