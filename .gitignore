@@ -54,3 +54,5 @@ dkms.conf
 # Database
 *.csv
 *.html
+parkingTicketsCHI
+parkingTicketsNYC

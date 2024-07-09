@@ -84,7 +84,7 @@ int addInfraction(parkingTicketsADT p, size_t infractionId, const char *descript
         p->size = infractionId + 1;
     }
     if (p->descriptions[infractionId] == NULL) {
-        p->descriptions[infractionId] = malloc(MAX_DESC*sizeof(char));
+        p->descriptions[infractionId] = malloc((strlen(description) + 1)*sizeof(char));
         if(p->descriptions[infractionId] == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return 0;
@@ -98,6 +98,7 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
     int c;
 
     if (list == NULL || (c = strcasecmp(list->plate, plate)) > 0) {
+        printf("%d\n", c);
         TListPlate newPlate = malloc(sizeof(struct nodePlate));
         if (newPlate == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
@@ -108,14 +109,14 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
         *newCount = newPlate->count;
         newPlate->tail = list;
         return newPlate;
-    }
-    if(c == 0){
+    } else if(c == 0){
         list->count++;
         *newCount = list->count;
         return list;
+    } else {
+        list->tail = addPlateRec(list->tail, plate, newCount);
+        return list;
     }
-    list->tail = addPlateRec(list->tail, plate, newCount);
-    return list;
 }
 
 static void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char *plate) {
