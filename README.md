@@ -1,6 +1,6 @@
 # Project Authors
 
-- Catalina Yelmin (64133)
+- Catalina Yelmini (64133)
 
 - Fancisco Trivelloni (64141)
 
@@ -30,12 +30,11 @@
 - *Second parameter*: the path to the infractions file.
 - Use a the city specific program with its corresponding city database. 
 - To execute a program, use the following structure: ./*executableProgram* *ticketFile* *infractionsFile*
-
-
 - The order of the files and the number of arguments must be as indicated above.
 
 # Additional project information
 
 - *Queries*: The generated query files (query1.csv, query2.csv, query3.csv) contain the results of the data processing.
-
 - *HTML*: The generated HTML files (query1.html, query2.html, query3.html) provide a visualization of the query results.
+
+
