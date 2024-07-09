@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 
-/* These values exceed the maximum values provided by a little */
 #define MAX_PLATE 15
 #define MAX_DESC 55
 #define MAX_AG 40

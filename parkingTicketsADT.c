@@ -4,31 +4,6 @@
 #include <string.h>
 #include <stdio.h>
 
-typedef struct nodePlate{
-    char plate[MAX_PLATE];
-    size_t count;
-    struct nodePlate * tail;
-}TNodePlate;
-typedef TNodePlate * TListPlate;
-
-typedef struct infraction{
-    char description[MAX_DESC];
-    TListPlate firstPlate; // Pointer to the first element of the list containing the different plates that committed the infraction
-    char plate[MAX_PLATE]; // Plate that committed the infraction the most
-    size_t maxPlateCount;  // Amount of times the plate committed the infraction
-    size_t totalCount;     // Total amount of times the infraction was committed
-}TInfraction;
-
-//To be used in query2
-typedef struct nodeAg{
-    char agency[MAX_AG];
-    TInfraction * infractions; // Vector containing the different infractions issued by the correspondent agency (each position in this vector corresponds with the infractionId)
-    size_t size; // Reserved space for the infractions vector
-    size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector
-    struct nodeAg * tail;  // Pointer to the next agency
-} TNodeAg;
-typedef TNodeAg * TListAg;
-
 //To be used in query1
 typedef struct nodeInfCount{
     char description[MAX_DESC];
@@ -46,15 +21,40 @@ typedef struct nodeInfAlpha{
 }TNodeInfAlpha;
 typedef TNodeInfAlpha * TListInfAlpha;
 
+//To upload given data:
+typedef struct nodePlate{
+    char plate[MAX_PLATE];
+    size_t count;
+    struct nodePlate * tail;
+}TNodePlate;
+typedef TNodePlate * TListPlate;
+
+typedef struct infraction{
+    char description[MAX_DESC];
+    TListPlate firstPlate; // First element of the list containing the different plates that committed the infraction
+    char plate[MAX_PLATE]; // Plate that committed the infraction the most
+    size_t maxPlateCount;  // Amount of times that plate committed the infraction
+    size_t totalCount;     // Total amount of times the infraction was committed
+}TInfraction;
+
+typedef struct nodeAg{
+    char agency[MAX_AG];
+    TInfraction * infractions; // Vector containing the different infractions issued by the correspondent agency
+    size_t size; // Reserved space
+    size_t maxPosInfraction; // Position where the most repeated infraction is stored in the vector
+    struct nodeAg * tail;  // Pointer to the next agency
+} TNodeAg;
+typedef TNodeAg * TListAg;
+
 struct parkingTicketsCDT{
-    TListAg firstAgency;  //Pointer to the first element of the list of agencies, which is added in alphabetical order
+    TListAg firstAgency;  //First element of the list of agencies, which is added in alphabetical order
     TListAg iterAg;
-    TListInfCount firstCount; //Pointer to the first element of the list of infractions ordered by infraction count
+    TListInfCount firstCount; //First element of the list of infractions ordered by infraction count
     TListInfCount iterCount;
-    TListInfAlpha firstAlpha; //Pointer to the first element of the list of infractions ordered alphabetically
+    TListInfAlpha firstAlpha; //First element of the list of infractions ordered alphabetically
     TListInfAlpha iterAlpha;
-    char ** descriptions;   //Vector where the position corresponds with the infractionId
-    size_t size; //Dimension of the vector
+    char ** descriptions;  //Vector to upload given infraction descriptions
+    size_t size;
 };
 
 parkingTicketsADT newParking(void) {
@@ -94,11 +94,14 @@ int addInfraction(parkingTicketsADT p, size_t infractionId, const char *descript
     return 1;
 }
 
-static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCount){
+static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCount) {
     int c;
 
+    // Print statement to check the current plate being processed
+   // printf("Processing plate: %s\n", plate);
+
     if (list == NULL || (c = strcasecmp(list->plate, plate)) > 0) {
-        printf("%d\n", c);
+        //printf("Creating new plate node for: %s\n", plate);
         TListPlate newPlate = malloc(sizeof(struct nodePlate));
         if (newPlate == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
@@ -109,11 +112,13 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
         *newCount = newPlate->count;
         newPlate->tail = list;
         return newPlate;
-    } else if(c == 0){
+    } else if (c == 0) {
+       // printf("Plate already exists: %s\n", plate);
         list->count++;
         *newCount = list->count;
         return list;
     } else {
+       // printf("Recursively adding plate: %s\n", plate);
         list->tail = addPlateRec(list->tail, plate, newCount);
         return list;
     }
@@ -214,6 +219,7 @@ int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, cons
         errno = ERROR_ARG;
         return flag;
     }
+
     if(infractionId >= p->size || p->descriptions[infractionId] == NULL){
         flag = 1;
         return flag;  // If one infraction is present in the infractions.csv but not in the tickets.csv, we skip it and don't do anything
@@ -244,6 +250,18 @@ static TListInfCount sortByCountRec(TListInfCount list, const char * infractionD
     return list;
 }
 
+static void sortListCount(parkingTicketsADT p) {
+    TListAg aux = p->firstAgency;
+    while (aux != NULL) {
+        for (size_t i = 0; i < aux->size; i++) {
+            if(aux->infractions[i].description[0] != '\0'){
+                p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].totalCount);
+            }
+        }
+        aux = aux->tail;
+    }
+}
+
 static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate) {
     int c;
     if (list == NULL || (c = strcasecmp(list->description, infractionDesc)) > 0) {
@@ -265,23 +283,17 @@ static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc
     return list;
 }
 
-static void sortListCount(parkingTicketsADT p) {
-    TListAg aux = p->firstAgency;
-    while (aux != NULL) {
-        for (size_t i = 0; i < aux->size; i++) {
-            if(aux->infractions[i].description[0] != '\0'){
-                p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].totalCount);
-            }
-        }
-        aux = aux->tail;
-    }
-}
+/* Separados por “;” el nombre de la infracción, la patente con la mayor cantidad de multas de esa infracción
+ * y la cantidad de multas. En caso de que existan dos o más patentes con la misma cantidad de multas para la
+ * misma infracción considerar la menor patente en orden alfabético.
+ * La información debe listarse ordenada en forma alfabética por infracción.
+ */
 
 static void sortListAlpha(parkingTicketsADT p){
     TListAg aux = p->firstAgency;
     while (aux != NULL) {
         for(size_t i = 0; i < aux->size; i++) {
-            if(aux->infractions[i].description[0] != '\0'){
+            if(aux->infractions[i].description[0] != '\0' && aux->infractions[i].plate[0] != '\0'){
                 p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate);
             }
         }
