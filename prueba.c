@@ -97,7 +97,11 @@ int addInfractionDesc(parkingTicketsADT p, size_t infractionId, char *descriptio
         p->size = infractionId + 1;
     }
     if(p->infractions[infractionId].description == NULL){
-        p->infractions[infractionId].description = malloc(MAX_DESC*sizeof(char));
+        p->infractions[infractionId].description = malloc((strlen(description) + 1)*sizeof(char));
+        if(p->infractions[infractionId].description == NULL || errno == ENOMEM){
+            errno = ERROR_MEM;
+            return 0;
+        }
         strcpy(p->infractions[infractionId].description, description);
     }
     return 1;
@@ -109,10 +113,8 @@ static void updateInfraction(parkingTicketsADT p, size_t infractionId) {
     }
 
     if (p->infractions[p->maxPosInfraction].totalCount == p->infractions[infractionId].totalCount) {
-        if (p->infractions[p->maxPosInfraction].description != NULL && p->infractions[infractionId].description != NULL) {
-            if (strcasecmp(p->infractions[p->maxPosInfraction].description, p->infractions[infractionId].description) > 0) {
-                p->maxPosInfraction = infractionId;
-            }
+        if((p->infractions[p->maxPosInfraction].description != NULL) && (p->infractions[infractionId].description != NULL) && strcasecmp(p->infractions[p->maxPosInfraction].description, p->infractions[infractionId].description) > 0) {
+            p->maxPosInfraction = infractionId;
         }
     }
 }
@@ -132,12 +134,17 @@ static void updatePlate(parkingTicketsADT p, size_t infractionId, size_t newCoun
 static TListPlate addPlateRec(TListPlate list, char *plate, char **samePlate, size_t *newCount) {
     int c;
     if (list == NULL || (c = strcasecmp(list->plate, plate)) > 0) {
-        TListPlate newPlate = malloc(sizeof(struct nodePlate));
+        TListPlate newPlate = malloc(sizeof(TNodePlate));
         if (newPlate == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return list;
         }
-        newPlate->plate = malloc(MAX_PLATE*sizeof(char));
+        newPlate->plate = malloc((strlen(plate) + 1)*sizeof(char));
+        if(newPlate->plate == NULL || errno == ENOMEM){
+            free(newPlate);
+            errno = ENOMEM;
+            return list;
+        }
         strcpy(newPlate->plate, plate);
         newPlate->count = 1;
         *newCount = newPlate->count;
@@ -151,7 +158,8 @@ static TListPlate addPlateRec(TListPlate list, char *plate, char **samePlate, si
         return list;
     }
     else {
-        return addPlateRec(list->tail, plate, samePlate, newCount);
+        list->tail = addPlateRec(list->tail, plate, samePlate, newCount);
+        return list;
     }
 }
 
@@ -170,7 +178,11 @@ int addTicket(parkingTicketsADT p, char *agency, size_t infractionId, char *plat
 
     //Copy agency that emitted it
     if(p->infractions[infractionId].agency == NULL){
-        p->infractions[infractionId].agency = malloc(MAX_AG * sizeof(char));
+        p->infractions[infractionId].agency = malloc((strlen(agency) + 1) * sizeof(char));
+        if(p->infractions[infractionId].agency == NULL || errno == ENOMEM){
+            errno = ENOMEM;
+            return 0;
+        }
         strcpy(p->infractions[infractionId].agency, agency);
     }
 
