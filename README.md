@@ -1,23 +1,18 @@
-
-# TPE-PI-1Q2024
-- Final date: 08/07/2024
-
 # Project Authors
 
-Name: Catalina Yelmin
-legajo:64133
+- Catalina Yelmin (64133)
 
-Name: Fancisco Trivelloni
-legajo:64141
+- Fancisco Trivelloni (64141)
 
-Name: Lorenzo Pizzuto Beltrán
-legajo: 64123
+- Lorenzo Pizzuto Beltrán (64123)
 
 # List of source and header files, with a brief explanation of each one
 
 - *parkingTickets.c*: Main source file containing the logic for processing parking tickets.
 - *parkingTicketsADT.c*: Source file that implements the ADT (Abstract Data Type) for handling parking tickets.
-- *parkingTicketsADT.h*: Header file for the parking tickets ADT.
+- *parkingTicketsADT.h*: Header file for the parkingticketsADT.
+- *htmlTable.c*: File that crates html files, introduces strings into tables, and closes said files.
+- *htmlTable.h*: Header file for htmlTable.
 - *Makefile*: Configuration file for compiling the project.
 
 # Commands needed to compile the project
@@ -28,11 +23,19 @@ legajo: 64123
 
 - *clean*: To delete all generated files, run the command "make clean".
 
-# Clarification
+# How to execture the programs
+
+- After compiling all needed programs, the executable needs two parameters which must be given in this specific order:
+- *First parameter*: the path to the tickets file.
+- *Second parameter*: the path to the infractions file.
+- Use a the city specific program with its corresponding city database. 
+- To execute a program, use the following structure: ./*executableProgram* *ticketFile* *infractionsFile*
+
 
 - The order of the files and the number of arguments must be as indicated above.
 
 # Additional project information
 
 - *Queries*: The generated query files (query1.csv, query2.csv, query3.csv) contain the results of the data processing.
+
 - *HTML*: The generated HTML files (query1.html, query2.html, query3.html) provide a visualization of the query results.

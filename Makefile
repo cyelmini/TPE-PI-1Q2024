@@ -14,7 +14,8 @@ OUT1 = parkingTicketsNYC
 OUT2 = parkingTicketsCHI
 
 # Targets
-all: $(OUT1) $(OUT2)
+all: 
+	$(OUT1) $(OUT2)
 
 # Build
 $(OUT1): $(OBJECTS)
