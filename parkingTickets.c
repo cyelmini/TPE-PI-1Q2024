@@ -165,8 +165,6 @@ void readTickets(FILE *fileTickets, parkingTicketsADT p) {
             checkTok(temp);
 
             temp = strtok(NULL, DELIM);
-
-            temp = strtok(NULL, DELIM);
             checkTok(temp);
             strcpy(plateRedacted, temp);
 
@@ -177,6 +175,10 @@ void readTickets(FILE *fileTickets, parkingTicketsADT p) {
             temp = strtok(NULL, DELIM);
             checkTok(temp);
             infractionCode = atoi(temp);
+
+            //fineLevel1Amount is not a value needed for the queries
+            temp = strtok(NULL, DELIM);
+            checkTok(temp);
 
             ok = addTicket(p, unitDescription, infractionCode, plateRedacted);
             if (!ok) {
