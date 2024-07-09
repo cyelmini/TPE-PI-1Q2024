@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "htmlTable.h"
-#include "aux.h"
+#include "prueba.h"
 
 #define MAX_CHARS 80
 #define MAX_AGENCY 37

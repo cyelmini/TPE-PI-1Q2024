@@ -1,4 +1,4 @@
-#include "aux.h"
+#include "prueba.h"
 #include <errno.h>
 #include <strings.h>
 #include <string.h>
