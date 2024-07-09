@@ -280,7 +280,9 @@ static void sortListCount(parkingTicketsADT p) {
     TListAg aux = p->firstAgency;
     while (aux != NULL) {
         for (size_t i = 0; i < aux->size; i++) {
-            p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].totalCount);
+            if(aux->infractions[i].description[0] != '\0'){
+                p->firstCount = sortByCountRec(p->firstCount, aux->infractions[i].description, aux->infractions[i].totalCount);
+            }
         }
         aux = aux->tail;
     }
@@ -314,7 +316,9 @@ static void sortListAlpha(parkingTicketsADT p){
     TListAg aux = p->firstAgency;
     while (aux != NULL) {
         for(size_t i = 0; i < aux->size; i++) {
-            p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate);
+            if(aux->infractions[i].description[0] != '\0'){
+                p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate);
+            }
         }
         aux = aux->tail;
     }
