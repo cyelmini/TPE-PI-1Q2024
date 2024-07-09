@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <strings.h>
 #include <string.h>
+#include <stdio.h>
 
 typedef struct nodePlate{
     char plate[MAX_PLATE];
@@ -52,8 +53,8 @@ struct parkingTicketsCDT{
     TListInfCount iterCount;
     TListInfAlpha firstAlpha; //Pointer to the first element of the list of infractions ordered alphabetically
     TListInfAlpha iterAlpha;
-    char **idReference;   //Vector where the position corresponds with the infractionId
-    size_t dimIdReference; //Dimension of the vector
+    char ** descriptions;   //Vector where the position corresponds with the infractionId
+    size_t size; //Dimension of the vector
 };
 
 parkingTicketsADT newParking(void) {
@@ -67,33 +68,35 @@ parkingTicketsADT newParking(void) {
     return aux;
 }
 
-int addInfraction(parkingTicketsADT p, size_t infractionId, const char* description) {
-    if(infractionId >= p->dimIdReference) {
-        char ** temp = realloc(p->idReference, (infractionId + 1) * sizeof(char *));
+int addInfraction(parkingTicketsADT p, size_t infractionId, const char *description) {
+    size_t newSize = infractionId + 1;
+
+    if(newSize > infractionId) {
+        char ** temp = realloc(p->descriptions, (infractionId + 1) * sizeof(char *));
         if (temp == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return 0;
         }
-        p->idReference = temp;
-        for (size_t i = p->dimIdReference; i <= infractionId; i++) {
-            p->idReference[i] = NULL;
+        p->descriptions = temp;
+        for (size_t i = p->size; i < infractionId + 1; i++) {
+            p->descriptions[i] = NULL;
         }
-        p->dimIdReference = infractionId + 1;
+        p->size = infractionId + 1;
     }
-    if (p->idReference[infractionId] == NULL) {
-        p->idReference[infractionId] = malloc(MAX_DESC*sizeof(char));
-        if(p->idReference[infractionId] == NULL || errno == ENOMEM) {
+    if (p->descriptions[infractionId] == NULL) {
+        p->descriptions[infractionId] = malloc(MAX_DESC*sizeof(char));
+        if(p->descriptions[infractionId] == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
             return 0;
         }
-        strcpy(p->idReference[infractionId], description);
+        strcpy(p->descriptions[infractionId], description);
     }
     return 1;
 }
 
-static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCount, const char **samePlate){
-    errno = OK;
+static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCount){
     int c;
+
     if (list == NULL || (c = strcasecmp(list->plate, plate)) > 0) {
         TListPlate newPlate = malloc(sizeof(struct nodePlate));
         if (newPlate == NULL || errno == ENOMEM) {
@@ -106,24 +109,24 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
         newPlate->tail = list;
         return newPlate;
     }
-    if (c == 0) {
+    if(c == 0){
         list->count++;
         *newCount = list->count;
-        *samePlate = list->plate;
         return list;
     }
-    list->tail = addPlateRec(list->tail, plate, newCount, samePlate);
+    list->tail = addPlateRec(list->tail, plate, newCount);
     return list;
 }
 
-static void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char *samePlate, const char *plate) {
-    if (list->infractions[infractionId].maxPlateCount < newCount) {
+static void updatePlate(TListAg list, size_t infractionId, size_t newCount, const char *plate) {
+    if(list->infractions[infractionId].maxPlateCount < newCount) {
         list->infractions[infractionId].maxPlateCount = newCount;
         strcpy(list->infractions[infractionId].plate, plate);
     }
 
-    // If there is a tie, prioritize the plate that comes first alphabetically
-    if (newCount == list->infractions[infractionId].maxPlateCount && samePlate != NULL && strcasecmp(samePlate, plate) > 0) {
+    // If there is a tie, prioritize the infraction that comes first alphabetically
+    if(newCount == list->infractions[infractionId].maxPlateCount && (strcasecmp(list->infractions[infractionId].plate, plate) > 0)) {
+        list->infractions[infractionId].maxPlateCount = newCount;
         strcpy(list->infractions[infractionId].plate, plate);
     }
 }
@@ -132,8 +135,10 @@ static void updateInfraction(TListAg list, size_t infractionId) {
     if (list->infractions[list->maxPosInfraction].totalCount < list->infractions[infractionId].totalCount) {
         list->maxPosInfraction = infractionId;
     }
+
     // If there is a tie, prioritize the infraction that comes first alphabetically
-    if (list->infractions[list->maxPosInfraction].totalCount == list->infractions[infractionId].totalCount && strcasecmp(list->infractions[list->maxPosInfraction].description, list->infractions[infractionId].description) > 0) {
+    if (list->infractions[list->maxPosInfraction].totalCount == list->infractions[infractionId].totalCount &&
+    strcasecmp(list->infractions[list->maxPosInfraction].description, list->infractions[infractionId].description) > 0) {
         list->maxPosInfraction = infractionId;
     }
 }
@@ -141,7 +146,6 @@ static void updateInfraction(TListAg list, size_t infractionId) {
 static void addTicketAux(TListAg list, const char *infractionDesc, size_t infractionId, const char *plate) {
     size_t newSize = infractionId + 1;
 
-    // If the required size is greater than the current size, resize the infraction vector
     if (newSize > list->size) {
         TInfraction *temp = realloc(list->infractions, newSize * sizeof(TInfraction));
         if (temp == NULL || errno == ENOMEM) {
@@ -169,11 +173,10 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
 
     // Add the plate that committed the infraction
     size_t newCount = 0;
-    const char *samePlate = NULL;
-    list->infractions[infractionId].firstPlate = addPlateRec(list->infractions[infractionId].firstPlate, plate, &newCount, &samePlate);
+    list->infractions[infractionId].firstPlate = addPlateRec(list->infractions[infractionId].firstPlate, plate, &newCount);
 
     // Update the plate that committed the infraction the most
-    updatePlate(list, infractionId, newCount, samePlate, plate);
+    updatePlate(list, infractionId, newCount, plate);
 
     // Update the most popular infraction by agency
     updateInfraction(list, infractionId);
@@ -181,7 +184,8 @@ static void addTicketAux(TListAg list, const char *infractionDesc, size_t infrac
 
 static TListAg addTicketRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag) {
     int c;
-    if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not exist
+
+    if(list == NULL || (c = strcasecmp(list->agency, agency)) > 0) {
         TListAg newAg = calloc(1, sizeof(TNodeAg));
         if(newAg == NULL || errno == ENOMEM) {
             errno = ERROR_MEM;
@@ -204,15 +208,16 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
 
 int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate) {
     int flag = 0;
+
     if(agency == NULL || plate ==  NULL){
         errno = ERROR_ARG;
         return flag;
     }
-    if(infractionId >= p->dimIdReference || p->idReference[infractionId] == NULL){
+    if(infractionId >= p->size || p->descriptions[infractionId] == NULL){
         flag = 1;
         return flag;  // If one infraction is present in the infractions.csv but not in the tickets.csv, we skip it and don't do anything
     }
-    p->firstAgency = addTicketRec(p->firstAgency, agency, p->idReference[infractionId], infractionId, plate, &flag);
+    p->firstAgency = addTicketRec(p->firstAgency, agency, p->descriptions[infractionId], infractionId, plate, &flag);
     return flag;
 }
 
@@ -359,10 +364,10 @@ char * nextAlpha(parkingTicketsADT p, char ** maxPlate, size_t * infractionCount
     return NULL;
 }
 
-static void freeIdReference(char ** idReference, size_t dimIdReference){
-    for(size_t i = 0; i < dimIdReference; i++){
-        if(idReference[i] != NULL){
-            free(idReference[i]);
+static void freeDescriptions(char ** descriptions, size_t size){
+    for(size_t i = 0; i < size; i++){
+        if(descriptions[i] != NULL){
+            free(descriptions[i]);
         }
     }
 }
@@ -415,7 +420,7 @@ void freeParkingTickets(parkingTicketsADT p){
     freeAgency(p->firstAgency);
     freeListCount(p->firstCount);
     freeListAlpha(p->firstAlpha);
-    freeIdReference(p->idReference, p->dimIdReference);
-    free(p->idReference);
+    freeDescriptions(p->descriptions, p->size);
+    free(p->descriptions);
     free(p);
 }
