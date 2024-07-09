@@ -261,39 +261,40 @@ void query2(parkingTicketsADT p){
     closeHTMLTable(table2);
 }
 
-void query3(parkingTicketsADT p){
+void query3(parkingTicketsADT p) {
     FILE * query3File = fopen("query3.csv", "wt");
     htmlTable table3 = newTable("query3.html", 3, "infraction", "plate", "tickets");
 
-    if(query3File == NULL || table3 == NULL){
+    if (query3File == NULL || table3 == NULL) {
         fprintf(stderr, "Error in file generation\n");
         exit(ERROR_OPEN);
     }
 
     fputs("infraction;plate;tickets\n", query3File);
 
-    char infraction[MAX_DESC];
+    char infractionCountStr[MAX_COUNT]; // Ensure this buffer is large enough
     toBeginAlpha(p);
-    if(errno != OK){
+    if (errno != OK) {
         fprintf(stderr, "Error in toBeginAlpha\n");
         exit(errno);
     }
 
-    while(hasNextAlpha(p)){
-        if(errno != OK){
+    while (hasNextAlpha(p)) {
+        if (errno != OK) {
             fprintf(stderr, "Error in hasNextAlpha\n");
             exit(errno);
         }
-        char * maxPlate;
-        size_t infractionCount;
+        char * maxPlate = NULL;
+        size_t infractionCount = 0;
         char * infractionName = nextAlpha(p, &maxPlate, &infractionCount);
 
-        if(infractionName != NULL) {
+        if (infractionName != NULL && maxPlate != NULL) {
             fprintf(query3File, "%s;%s;%ld\n", infractionName, maxPlate, infractionCount);
-            snprintf(infraction, MAX_DESC, "%ld", infractionCount);
-            addHTMLRow(table3, infractionName, maxPlate, infraction);
+            snprintf(infractionCountStr, MAX_COUNT, "%ld", infractionCount);
+            addHTMLRow(table3, infractionName, maxPlate, infractionCountStr);
         }
     }
     fclose(query3File);
     closeHTMLTable(table3);
 }
+

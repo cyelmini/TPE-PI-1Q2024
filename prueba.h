@@ -19,14 +19,14 @@ parkingTicketsADT newParking(void);
 * the infraction description. Should be filled before inputting
 * the tickets. Returns 1 if successfully done and 0 if not.
 */
-int addInfractionDesc(parkingTicketsADT p, size_t infractionId, const char *description);
+int addInfractionDesc(parkingTicketsADT p, size_t infractionId, char *description);
 
 
 /* Adds an infraction committed by a given plate to the correspondent agency that emitted it.
 * If the agency did not exist, it adds it to the list as well. Returns 1 if successfully done
 * and 0 if not.
 */
-int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate);
+int addTicket(parkingTicketsADT p, char *agency, size_t infractionId, char *plate);
 
 
 /* Frees the memory reserved by the ADT */
