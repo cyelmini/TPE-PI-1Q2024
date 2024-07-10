@@ -17,10 +17,14 @@ typedef TNodeInfCount * TListInfCount;
 /* List of infractions that contains its description, the plate that committed this infraction the most and the amount
  * of times it did (to be used in query 3)
  */
+
 typedef struct nodeInfAlpha{
     char description[MAX_DESC];
     char plate[MAX_PLATE];
     size_t plateCount;
+    size_t minAmount;
+    size_t maxAmount;
+    size_t diff; // esto se podria calcular al imprimirlo pero lo guardo para separar backend
     struct nodeInfAlpha * tail;
 }TNodeInfAlpha;
 typedef TNodeInfAlpha * TListInfAlpha;
@@ -39,25 +43,17 @@ typedef TNodePlate * TListPlate;
  * infraction description, the first element of the list of plates that committed this infraction. It also stores
  * the plate that committed the infraction the most and the amount of times it did.
  */
+
 typedef struct infraction{
     char description[MAX_DESC];
     TListPlate firstPlate;
     char plate[MAX_PLATE];
     size_t maxPlateCount;
     size_t totalCount;
+
+    size_t minAmount;//se actualizan en el addTicketToAgency
+    size_t maxAmount;
 }TInfraction;
-
-////////////////////////////////para query5 /////////////////////
-// typedef struct infraction{
-//     char description[MAX_DESC];
-//     TListPlate firstPlate;
-//     char plate[MAX_PLATE];
-//     size_t maxPlateCount;
-//     size_t totalCount;
-
-//     size_t minAmount;//se actualizan en el addTicketToAgency
-//     size_t maxAmount;
-// }TInfraction;
 
 /* List of agencies containing their names, the infractions emitted by them and the position where the most emitted
  * infraction is stored (to be used in query2)
@@ -183,8 +179,7 @@ static void updateInfraction(TListAg list, size_t infractionId) {
  * by calling upon addPlateRec. If needed, updates the plate that committed the infraction the most and the most
  * popular infraction by agency.
  */
-// static void addTicketToAgency(TListAg list, const char *infractionDesc, size_t infractionId, const char *plate, size_t amount) {
-static void addTicketToAgency(TListAg list, const char *infractionDesc, size_t infractionId, const char *plate) {
+static void addTicketToAgency(TListAg list, const char *infractionDesc, size_t infractionId, const char *plate, size_t amount) {
 
     if(infractionId >= list->size) {
         TInfraction *temp = realloc(list->infractions, (infractionId + 1)*sizeof(TInfraction));
@@ -219,21 +214,20 @@ static void addTicketToAgency(TListAg list, const char *infractionDesc, size_t i
     // Update the most popular infraction by agency
     updateInfraction(list, infractionId);
 
-    // // Check minAmount and maxAmount ////////// para query5 ///////////////////////////////////////////
-    // if(list->infractions[infractionId].minAmount>amount){
-    //     list->infractions[infractionId].minAmount=amount;
-    // }
+    // Check minAmount and maxAmount ////////// para query5 ///////////////////////////////////////////
+    if(list->infractions[infractionId].minAmount>amount){
+        list->infractions[infractionId].minAmount=amount;
+    }
     
-    // if(list->infractions[infractionId].maxAmount<amount){
-    //     list->infractions[infractionId].maxAmount=amount;
-    // }
+    if(list->infractions[infractionId].maxAmount<amount){
+        list->infractions[infractionId].maxAmount=amount;
+    }
 }
 
 /* Searches for the given agency in the list of agencies. If it does not found it, it adds it to the list. In either
  * case, it registers the new ticket calling upon addTicketToAgency.
  */
-// static TListAg addTicketRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag, size_t amount) {
-static TListAg addTicketRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag) {
+static TListAg addTicketRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag, size_t amount) {
     int c;
     if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not exist
         TListAg newAg = calloc(1, sizeof(TNodeAg));
@@ -242,20 +236,17 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
             return list;
         }
         strcpy(newAg->agency, agency);
-        addTicketToAgency(newAg, infractionDesc, infractionId, plate);
-        // addTicketToAgency(newAg, infractionDesc, infractionId, plate, amount);
+        addTicketToAgency(newAg, infractionDesc, infractionId, plate, amount);
         newAg->tail = list;
         *flag = 1;
         return newAg;
     }
     if(c == 0) {
-        addTicketToAgency(list, infractionDesc, infractionId, plate);
-        // addTicketToAgency(list, infractionDesc, infractionId, plate, amount);
+        addTicketToAgency(list, infractionDesc, infractionId, plate, amount);
         *flag = 1;
         return list;
     }
-    // list->tail = addTicketRec(list->tail, agency, infractionDesc, infractionId, plate, flag, amount);
-    list->tail = addTicketRec(list->tail, agency, infractionDesc, infractionId, plate, flag);
+    list->tail = addTicketRec(list->tail, agency, infractionDesc, infractionId, plate, flag, amount);
     return list;
 }
 
@@ -263,8 +254,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
 * If the agency did not exist, it adds it to the list as well. Returns 1 if successfully done
 * and 0 if not.
 */
-// int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate, size_t amount) {
-int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate) {
+int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate, size_t amount) {
     int flag = 0;
     if(agency == NULL || plate ==  NULL){
         errno = ERROR_ARG;
@@ -274,8 +264,7 @@ int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, cons
         flag = 1;
         return flag;  // If one infraction is present in the infractions.csv but not in the tickets.csv, we skip it and don't do anything
     }
-    // p->firstAgency = addTicketRec(p->firstAgency, agency, p->descriptions[infractionId], infractionId, plate, &flag, amount);
-    p->firstAgency = addTicketRec(p->firstAgency, agency, p->descriptions[infractionId], infractionId, plate, &flag);
+    p->firstAgency = addTicketRec(p->firstAgency, agency, p->descriptions[infractionId], infractionId, plate, &flag, amount);
     return flag;
 }
 
@@ -315,8 +304,7 @@ static void sortListCount(parkingTicketsADT p) {
         aux = aux->tail;
     }
 }
-
-static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate) {
+static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate,size_t minAmount, size_t maxAmount) {
     int c;
     if (list == NULL || (c = strcasecmp(list->description, infractionDesc)) > 0) {
         TListInfAlpha newInfAlpha = malloc(sizeof(TNodeInfAlpha));
@@ -327,6 +315,11 @@ static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc
         strcpy(newInfAlpha->description, infractionDesc);
         strcpy(newInfAlpha->plate, plate);
         newInfAlpha->plateCount = count;
+        
+        newInfAlpha->minAmount = minAmount;
+        newInfAlpha->maxAmount = maxAmount;       
+        newInfAlpha->diff = (maxAmount-minAmount);
+
         newInfAlpha->tail = list;
         return newInfAlpha;
     }
@@ -345,7 +338,7 @@ static void sortListAlpha(parkingTicketsADT p){
     while (aux != NULL) {
         for(size_t i = 0; i < aux->size; i++) {
             if(aux->infractions[i].description[0] != '\0'){
-                p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate);
+                p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate, aux->infractions[i].minAmount, aux->infractions[i].maxAmount);
             }
         }
         aux = aux->tail;
