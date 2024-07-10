@@ -119,7 +119,6 @@ int addInfraction(parkingTicketsADT p, size_t infractionId, const char *descript
 }
 
 static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCount){
-    /*
     int c;
     if (list == NULL || (c = strcasecmp(list->plate, plate)) > 0) {
         TListPlate newPlate = malloc(sizeof(struct nodePlate));
@@ -139,7 +138,6 @@ static TListPlate addPlateRec(TListPlate list, const char *plate, size_t *newCou
         return list;
     }
     list->tail = addPlateRec(list->tail, plate, newCount);
-     */
     return list;
 }
 
