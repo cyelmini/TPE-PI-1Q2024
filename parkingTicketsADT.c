@@ -512,3 +512,68 @@ void freeParkingTickets(parkingTicketsADT p){
     free(p);
 }
 
+
+
+////////////////////////////////////////////////////cosas para query 5 no fucinan
+////////////////////// PRUEBA q5 /////////////////////////
+
+// void query5(parkingTicketsADT p){
+//     FILE * query5File = fopen("query5.csv", "wt");
+//     htmlTable table5 = newTable("query5.html", 4, "infraction", "minAmount", "maAmount","diffAmount");
+
+//     if(query5File == NULL || table5 == NULL){
+//         fprintf(stderr, "Error in file generation\n");
+//         exit(ERROR_OPEN);
+//     }
+
+//     fputs("infraction;minAmont;maxAmount;diffAmount\n", query5File);
+
+//     toBeginAlphaQ5(p);
+//     if(errno != OK){
+//         fprintf(stderr, "Error in toBeginAlpha\n");
+//         exit(errno);
+//     }
+
+//     char count[MAX_COUNT];
+//     while(hasNextAlphaQ5(p)){
+//         if(errno != OK){
+//             fprintf(stderr, "Error in hasNextAlpha\n");
+//             exit(errno);
+//         }
+//         size_t minAmont;
+//         size_t maxAmount;
+//         size_t diffAmount;
+//         char * infractionName = nextAlphaQ5(p, &minAmont, &maxAmount, &diffAmount);
+
+//         if(infractionName != NULL) {
+//             fprintf(query5File, "%s;%ld;%ld;%ld\n", infractionName, minAmont, maxAmount, diffAmount);
+//             addHTMLRow(table5, infractionName, minAmont, minAmont, maxAmount, diffAmount);
+//         }
+//     }
+//     fclose(query5File);
+//     closeHTMLTable(table5);
+// }
+// void toBeginAlphaQ5(parkingTicketsADT p){
+//     if(p == NULL){
+//         errno = ERROR_ARG;
+//     }
+//     // sortListAlpha(p);
+//     p->iterAlpha = p->firstAlpha;
+// }
+// int hasNextAlphaQ5(parkingTicketsADT p){
+//     if(p == NULL){
+//         errno = ERROR_ARG;
+//     }
+//     return p->iterAlpha != NULL;
+// }
+// char * nextAlphaQ5(parkingTicketsADT p, size_t* minAmont, size_t* maxAmount, size_t* diffAmount){
+//     if(hasNextAlphaQ5(p)){
+//         char * ans = p->iterAlpha->description;
+//         *minAmont=p->iterAlpha->minAmont;
+//         *maxAmount=p->iterAlpha->maxAmount;
+//         *diffAmount=p->iterAlpha->diff;
+//         p->iterAlpha = p->iterAlpha->tail;
+//         return ans;
+//     }
+//     return NULL;
+// }
