@@ -36,10 +36,9 @@ typedef TNodePlate * TListPlate;
 
 
 /* Infractions is a vector where each position corresponds with an infractionId. Each element of this vector has the
- * infraction description, the first element of the list of plates that committed this infraction. It also stores
+ * infraction description, and the first element of the list of plates that committed this infraction. It also stores
  * the plate that committed the infraction the most and the amount of times it did.
  */
-
 typedef struct infraction{
     char description[MAX_DESC];
     TListPlate firstPlate;
@@ -47,6 +46,7 @@ typedef struct infraction{
     size_t maxPlateCount;
     size_t totalCount;
 }TInfraction;
+
 
 /* List of agencies containing their names, the infractions emitted by them and the position where the most emitted
  * infraction is stored (to be used in query2)
@@ -90,7 +90,7 @@ parkingTicketsADT newParking(void) {
     return aux;
 }
 
-/* ------------------------------------------ Add functions --------------------------------------------------------- */
+/* -------------------------------------------- Add functions ------------------------------------------------------- */
 
 /* Generates a reference for the inputted infraction id and the infraction description. Should be filled before
  * inputting the tickets. Returns 1 if successfully done and 0 if not.
@@ -209,7 +209,7 @@ static void addTicketToAgency(TListAg list, const char *infractionDesc, size_t i
 }
 
 /* Searches for the given agency in the list of agencies. If it does not found it, it adds it to the list. In either
- * case, it registers the new ticket calling upon addTicketToAgency.
+ * case, it registers the new ticket by calling upon addTicketToAgency.
  */
 static TListAg addTicketRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag) {
     int c;
@@ -226,7 +226,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
         return newAg;
     }
     if(c == 0) {
-        addTicketToAgency(list, infractionDesc, infractionId, plate, amount);
+        addTicketToAgency(list, infractionDesc, infractionId, plate);
         *flag = 1;
         return list;
     }
@@ -492,3 +492,4 @@ void freeParkingTickets(parkingTicketsADT p){
     free(p);
 }
 
+/* ------------------------------------------------------------------------------------------------------------------ */

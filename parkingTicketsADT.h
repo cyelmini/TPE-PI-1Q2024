@@ -33,7 +33,7 @@ int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, cons
 void freeParkingTickets(parkingTicketsADT p);
 
 
-/* ----------------- Functions to iterate over the three main lists meant to resolve the queries----------------------*/
+/* ------------------ Functions to iterate over the three main lists meant to resolve the queries --------------------*/
 
 /* To iterate over the lists of agencies, sets iterator on
 * the first element of such list.
@@ -91,7 +91,7 @@ char * nextAlpha(parkingTicketsADT p, char ** maxPlate, size_t * infractionCount
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-enum {OK = 0, ERROR_MEM, ERROR_TOK, ERROR_ARG, ERROR_OPEN, NEXT_ERROR, ERROR_READ};
+enum {OK = 0, ERROR_MEM, ERROR_TOK, ERROR_ARG, ERROR_OPEN, NEXT_ERROR};
 
 /*
  * ERROR_MEM = Memory error
