@@ -23,12 +23,12 @@
 
 - *clean*: To delete all generated files, run the command "make clean".
 
-# How to execture the programs
+# How to execute the programs
 
 - After compiling all needed programs, the executable needs two parameters which must be given in this specific order:
 - *First parameter*: the path to the tickets file.
 - *Second parameter*: the path to the infractions file.
-- Use a the city specific program with its corresponding city database. 
+- Use the city specific program with its corresponding city database. 
 - To execute a program, use the following structure: ./*executableProgram* *ticketFile* *infractionsFile*
 - The order of the files and the number of arguments must be as indicated above.
 

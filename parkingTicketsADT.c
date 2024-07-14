@@ -158,7 +158,7 @@ static void updatePlate(TListAg list, size_t infractionId, size_t newCount, cons
 
 static void updateInfraction(TListAg list, size_t infractionId) {
 
-    // If there is a tie, prioritize the infraction that comes first alphabetically
+    // If there is a tie, we prioritize the infraction that comes first alphabetically
 
     if (list->infractions[list->maxPosInfraction].totalCount < list->infractions[infractionId].totalCount ||
     (list->infractions[list->maxPosInfraction].totalCount == list->infractions[infractionId].totalCount &&
