@@ -36,7 +36,7 @@ typedef TNodePlate * TListPlate;
 
 
 /* Infractions is a vector where each position corresponds with an infractionId. Each element of this vector has the
- * infraction description, and the first element of the list of plates that committed this infraction. It also stores
+ * infraction description and the first element of the list of plates that committed this infraction. It also stores
  * the plate that committed the infraction the most and the amount of times it did.
  */
 typedef struct infraction{

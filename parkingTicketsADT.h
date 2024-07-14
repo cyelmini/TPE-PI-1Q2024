@@ -10,7 +10,7 @@
 typedef struct parkingTicketsCDT * parkingTicketsADT;
 
 /* Generates a system to process the data of the different
-* infractions committed
+* infractions committed.
 */
 parkingTicketsADT newParking(void);
 
@@ -29,7 +29,9 @@ int addInfraction(parkingTicketsADT p, size_t infractionId, const char *descript
 int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate);
 
 
-/* Frees the memory reserved by the ADT */
+/* Frees the memory reserved
+ * by the ADT.
+ */
 void freeParkingTickets(parkingTicketsADT p);
 
 
