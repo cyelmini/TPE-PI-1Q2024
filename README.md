@@ -1,8 +1,8 @@
 # Project Authors
 
-- Catalina Yelmini (64133)
+- Francisco Trivelloni (64141)
 
-- Fancisco Trivelloni (64141)
+- Catalina Yelmini (64133)
 
 - Lorenzo Pizzuto Beltrán (64123)
 
