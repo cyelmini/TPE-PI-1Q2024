@@ -14,17 +14,13 @@ typedef struct nodeInfCount{
 typedef TNodeInfCount * TListInfCount;
 
 
-/* List of infractions that contains its description, the plate that committed this infraction the most and the amount
- * of times it did (to be used in query 3)
+/* List of infractions that contains its description, the plate that committed
+ * this infraction the most and the amount of times it did (to be used in query 3)
  */
-
 typedef struct nodeInfAlpha{
     char description[MAX_DESC];
     char plate[MAX_PLATE];
     size_t plateCount;
-    size_t minAmount;
-    size_t maxAmount;
-    size_t diff; // esto se podria calcular al imprimirlo pero lo guardo para separar backend
     struct nodeInfAlpha * tail;
 }TNodeInfAlpha;
 typedef TNodeInfAlpha * TListInfAlpha;
@@ -50,9 +46,6 @@ typedef struct infraction{
     char plate[MAX_PLATE];
     size_t maxPlateCount;
     size_t totalCount;
-
-    size_t minAmount;//se actualizan en el addTicketToAgency
-    size_t maxAmount;
 }TInfraction;
 
 /* List of agencies containing their names, the infractions emitted by them and the position where the most emitted
@@ -179,7 +172,7 @@ static void updateInfraction(TListAg list, size_t infractionId) {
  * by calling upon addPlateRec. If needed, updates the plate that committed the infraction the most and the most
  * popular infraction by agency.
  */
-static void addTicketToAgency(TListAg list, const char *infractionDesc, size_t infractionId, const char *plate, size_t amount) {
+static void addTicketToAgency(TListAg list, const char *infractionDesc, size_t infractionId, const char *plate) {
 
     if(infractionId >= list->size) {
         TInfraction *temp = realloc(list->infractions, (infractionId + 1)*sizeof(TInfraction));
@@ -213,21 +206,12 @@ static void addTicketToAgency(TListAg list, const char *infractionDesc, size_t i
 
     // Update the most popular infraction by agency
     updateInfraction(list, infractionId);
-
-    // Check minAmount and maxAmount ////////// para query5 ///////////////////////////////////////////
-    if(list->infractions[infractionId].minAmount>amount){
-        list->infractions[infractionId].minAmount=amount;
-    }
-    
-    if(list->infractions[infractionId].maxAmount<amount){
-        list->infractions[infractionId].maxAmount=amount;
-    }
 }
 
 /* Searches for the given agency in the list of agencies. If it does not found it, it adds it to the list. In either
  * case, it registers the new ticket calling upon addTicketToAgency.
  */
-static TListAg addTicketRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag, size_t amount) {
+static TListAg addTicketRec(TListAg list, const char *agency, const char *infractionDesc, size_t infractionId, const char *plate, int *flag) {
     int c;
     if (list == NULL || (c = strcasecmp(list->agency, agency)) > 0) { // Agency does not exist
         TListAg newAg = calloc(1, sizeof(TNodeAg));
@@ -236,7 +220,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
             return list;
         }
         strcpy(newAg->agency, agency);
-        addTicketToAgency(newAg, infractionDesc, infractionId, plate, amount);
+        addTicketToAgency(newAg, infractionDesc, infractionId, plate);
         newAg->tail = list;
         *flag = 1;
         return newAg;
@@ -246,7 +230,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
         *flag = 1;
         return list;
     }
-    list->tail = addTicketRec(list->tail, agency, infractionDesc, infractionId, plate, flag, amount);
+    list->tail = addTicketRec(list->tail, agency, infractionDesc, infractionId, plate, flag);
     return list;
 }
 
@@ -254,7 +238,7 @@ static TListAg addTicketRec(TListAg list, const char *agency, const char *infrac
 * If the agency did not exist, it adds it to the list as well. Returns 1 if successfully done
 * and 0 if not.
 */
-int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate, size_t amount) {
+int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, const char *plate) {
     int flag = 0;
     if(agency == NULL || plate ==  NULL){
         errno = ERROR_ARG;
@@ -264,7 +248,7 @@ int addTicket(parkingTicketsADT p, const char *agency, size_t infractionId, cons
         flag = 1;
         return flag;  // If one infraction is present in the infractions.csv but not in the tickets.csv, we skip it and don't do anything
     }
-    p->firstAgency = addTicketRec(p->firstAgency, agency, p->descriptions[infractionId], infractionId, plate, &flag, amount);
+    p->firstAgency = addTicketRec(p->firstAgency, agency, p->descriptions[infractionId], infractionId, plate, &flag);
     return flag;
 }
 
@@ -304,7 +288,8 @@ static void sortListCount(parkingTicketsADT p) {
         aux = aux->tail;
     }
 }
-static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate,size_t minAmount, size_t maxAmount) {
+
+static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc, size_t count, const char *plate) {
     int c;
     if (list == NULL || (c = strcasecmp(list->description, infractionDesc)) > 0) {
         TListInfAlpha newInfAlpha = malloc(sizeof(TNodeInfAlpha));
@@ -315,11 +300,6 @@ static TListInfAlpha sortAlphaRec(TListInfAlpha list, const char *infractionDesc
         strcpy(newInfAlpha->description, infractionDesc);
         strcpy(newInfAlpha->plate, plate);
         newInfAlpha->plateCount = count;
-        
-        newInfAlpha->minAmount = minAmount;
-        newInfAlpha->maxAmount = maxAmount;       
-        newInfAlpha->diff = (maxAmount-minAmount);
-
         newInfAlpha->tail = list;
         return newInfAlpha;
     }
@@ -338,7 +318,7 @@ static void sortListAlpha(parkingTicketsADT p){
     while (aux != NULL) {
         for(size_t i = 0; i < aux->size; i++) {
             if(aux->infractions[i].description[0] != '\0'){
-                p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate, aux->infractions[i].minAmount, aux->infractions[i].maxAmount);
+                p->firstAlpha = sortAlphaRec(p->firstAlpha, aux->infractions[i].description, aux->infractions[i].maxPlateCount, aux->infractions[i].plate);
             }
         }
         aux = aux->tail;
@@ -512,68 +492,3 @@ void freeParkingTickets(parkingTicketsADT p){
     free(p);
 }
 
-
-
-////////////////////////////////////////////////////cosas para query 5 no fucinan
-////////////////////// PRUEBA q5 /////////////////////////
-
-// void query5(parkingTicketsADT p){
-//     FILE * query5File = fopen("query5.csv", "wt");
-//     htmlTable table5 = newTable("query5.html", 4, "infraction", "minAmount", "maAmount","diffAmount");
-
-//     if(query5File == NULL || table5 == NULL){
-//         fprintf(stderr, "Error in file generation\n");
-//         exit(ERROR_OPEN);
-//     }
-
-//     fputs("infraction;minAmont;maxAmount;diffAmount\n", query5File);
-
-//     toBeginAlphaQ5(p);
-//     if(errno != OK){
-//         fprintf(stderr, "Error in toBeginAlpha\n");
-//         exit(errno);
-//     }
-
-//     char count[MAX_COUNT];
-//     while(hasNextAlphaQ5(p)){
-//         if(errno != OK){
-//             fprintf(stderr, "Error in hasNextAlpha\n");
-//             exit(errno);
-//         }
-//         size_t minAmont;
-//         size_t maxAmount;
-//         size_t diffAmount;
-//         char * infractionName = nextAlphaQ5(p, &minAmont, &maxAmount, &diffAmount);
-
-//         if(infractionName != NULL) {
-//             fprintf(query5File, "%s;%ld;%ld;%ld\n", infractionName, minAmont, maxAmount, diffAmount);
-//             addHTMLRow(table5, infractionName, minAmont, minAmont, maxAmount, diffAmount);
-//         }
-//     }
-//     fclose(query5File);
-//     closeHTMLTable(table5);
-// }
-// void toBeginAlphaQ5(parkingTicketsADT p){
-//     if(p == NULL){
-//         errno = ERROR_ARG;
-//     }
-//     // sortListAlpha(p);
-//     p->iterAlpha = p->firstAlpha;
-// }
-// int hasNextAlphaQ5(parkingTicketsADT p){
-//     if(p == NULL){
-//         errno = ERROR_ARG;
-//     }
-//     return p->iterAlpha != NULL;
-// }
-// char * nextAlphaQ5(parkingTicketsADT p, size_t* minAmont, size_t* maxAmount, size_t* diffAmount){
-//     if(hasNextAlphaQ5(p)){
-//         char * ans = p->iterAlpha->description;
-//         *minAmont=p->iterAlpha->minAmont;
-//         *maxAmount=p->iterAlpha->maxAmount;
-//         *diffAmount=p->iterAlpha->diff;
-//         p->iterAlpha = p->iterAlpha->tail;
-//         return ans;
-//     }
-//     return NULL;
-// }
