@@ -1,12 +1,10 @@
-# Project Authors
-
-- Francisco Trivelloni (64141)
+# Project authors
 
 - Catalina Yelmini (64133)
-
+- Francisco Trivelloni (64141)
 - Lorenzo Pizzuto Beltrán (64123)
 
-# List of source and header files, with a brief explanation of each one
+# List of source and header files
 
 - *parkingTickets.c*: Main source file containing the logic for processing parking tickets.
 - *parkingTicketsADT.c*: Source file that implements the ADT (Abstract Data Type) for handling parking tickets.
