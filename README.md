@@ -22,7 +22,9 @@
 ## Commands needed to compile
 
 - **`make all`**: Compile the executables by running `make all` in the console. This will generate two executables:
+  
   - **`parkingTicketsNYC`**: Executable for processing New York City parking tickets.
+    
   - **`parkingTicketsCHI`**: Executable for processing Chicago parking tickets.
 
 - **`make clean`**: Delete all generated files by running `make clean`.
