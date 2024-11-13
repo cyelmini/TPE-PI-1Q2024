@@ -1,5 +1,7 @@
 # Final Project - Imperative Programming
 
+This project is designed to process and analyze parking ticket data for two major cities, New York City and Chicago. The goal is to parse, store, and organize information from parking ticket records and infraction data, and then generate .csv reports summarizing the processed data.
+
 ## Students 
 - **Catalina Yelmini** (64133)
 - **Francisco Trivelloni** (64141)
